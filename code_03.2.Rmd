@@ -1,0 +1,585 @@
+---
+title: "Biostatistica's Project"
+author: "Simone Farallo & Michele Salvaterra"
+output:
+  html_document:
+    toc: yes
+    fig_caption: yes
+    theme: flatly
+    css: styles.css
+  pdf_document:
+    toc: yes
+---
+
+# Abstract
+
+# Introduction
+
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| #### **Variabile** | #### **Tipologia** | #### **Descrizione**                                                                                                                                                                                 |
++:===================+:===================+:=====================================================================================================================================================================================================+
+| PAZIENTE           | *Numeric*          | ID del paziente.                                                                                                                                                                                     |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| NASCITA            | *Character*        | Data di nascita del paziente.                                                                                                                                                                        |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| SEX                | *Numeric*          | Sesso del paziente (1 = uomo ; 2 = donna).                                                                                                                                                           |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| STATOCIV           | *Numeric*          | Stato civile del paziente( 1 = non sposato/a senza partner ;2 = coniugato/a; 3 = convivente; 4 = separato/divorziato; 5 = vedovo/a).                                                                 |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| PESO               | *Numeric*          | Peso del paziente (Kg).                                                                                                                                                                              |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ALTEZZA            | *Numeric*          | Altezza del paziente (Cm).                                                                                                                                                                           |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| CADUTE             | *Numeric*          | Numero di cadute del paziente.                                                                                                                                                                       |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| CCSCORE            | *Numeric*          | Il Charlson Comorbidity Score è un indice di gravità della malattia che viene utilizzato per valutare il rischio di mortalità e morbilità associato a comorbidità in pazienti con malattie croniche. |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| SOFAING            | *Numeric*          | Il punteggio SOFA (Sequential Organ Failure Assessment) è un indice utilizzato per valutare la gravità della disfunzione di vari organi nei pazienti.                                                |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| MMSE               | *Character*        | Il Mini-Mental State Examination (MMSE) è uno strumento di valutazione cognitiva ampiamente utilizzato per valutare la funzione cognitiva nei pazienti (-1 = Mancante ; -2 = Non valutabile).        |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ALB                | *Character*        | Albumina                                                                                                                                                                                             |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| CALC               | *Character*        | Calcio                                                                                                                                                                                               |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| VITD               | *Character*        | Vitamina D                                                                                                                                                                                           |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| HBING              | *Character*        | Emoglobina                                                                                                                                                                                           |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| TEMPRIC            | *Numeric*          | Durata del ricovero del paziente in minuti ( -1 = Non disponibile ; -2 = Da altro ospedale)                                                                                                          |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| DATDIM             | *POSIXct*          | Data dimissione del paziente.                                                                                                                                                                        |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| DATINT             | *POSIXct*          | Data intervento del paziente.                                                                                                                                                                        |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| INTDURAT           | *Numeric*          | Durata dell'intervento in minuti.                                                                                                                                                                    |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ANEST              | *Numeric*          | Tipo di anestesia utilizzata ( 1 = generale; 2 = spinale; 3 = peridurale; 4 = plessica; 5 = combinata; 6 = sedazione; 7 = locale assisitita; 8 = altro)                                              |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| DATA DECESSO       | *Numeric*          | Data decesso del paziente.                                                                                                                                                                           |
++--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+# Preliminary Operations
+
+Carichiamo le librerie utili alle nostre analisi.
+
+```{r}
+#Management
+library(readxl)
+library(stringr)
+#Visualization
+library(ggplot2)
+
+```
+
+Settiamo la directory.
+
+```{r}
+setwd("C:/Users/Simone/Documents/Desktop/BIOSTATISTICA")
+```
+
+# Data loading
+
+```{r}
+data <- read_excel("SOFA.xlsx",)
+head(data)
+```
+
+PRima di svolgere le analisi, Osserviamo la struttura del dataset
+
+```{r}
+#Struttura del dataset
+str(data)
+```
+
+Osserviamo dei tipi di dati inaddati per alcune colonne come le date o i valori numerici di tipo stringa.
+
+```{r}
+#Statistiche descrittive
+summary(data)
+```
+
+```{r}
+#Conta il numero di valori mancanti per ciascuna variabile del dataset
+colSums(is.na(data))
+```
+
+Osservando i dati notiamo diversi problemi nel dataset come valori mancanti,outlier,ecc inoltre osservando le distribuzioni delle variabili si notano diversi valori anomali e valori da correggere. quindi prima di svolgere le un analisi esplorativa più approfondita, deicidiamod di pulire e preprocessare il dataset.
+
+# Data Cleaning
+
+Per comodità e data la grandezza del dataset andremo in ordine e corregeremo ogni variabile manualmente.
+
+**Paziente**
+
+Controllo dei duplicati
+
+```{r}
+data$PAZIENTE[duplicated(data$PAZIENTE)]
+data[data$PAZIENTE== 16,]
+```
+
+C'è un duplicato negli id dei pazienti, sembra che ci siano due pazienti diversi con lo stesso id, quindi procediamo a cambiare id.
+
+```{r}
+data[7,1] = 17
+data[7,1]
+data[data$PAZIENTE==16 | data$PAZIENTE==17,]
+```
+
+**Nascite**
+
+```{r}
+data$NASCITA
+```
+
+Come già notato in precedenza i valori delle date sono completamente insensati qauesto è dovuto al fatto che R non legga bene i file excel inoltre c'è un valore da correggere per il paziente 111 e tre valori con errori di battitura.
+
+```{r}
+(i <- data[data$PAZIENTE==111,])
+data$NASCITA[data$PAZIENTE==111]=sapply(Map(append, strsplit(i$NASCITA,""), after = nchar(i$NASCITA) - 4, "/"), paste, collapse = "")
+data[data$PAZIENTE==111,]
+```
+
+```{r}
+data$NASCITA = as.numeric(data$NASCITA)
+(data$NASCITA = as.Date(x = data$NASCITA,origin = "1899-12-30", ))
+```
+
+Correggiamo i tre valori mancanti che sono i tre errori di battitura osservando la loro posizione nel df.
+
+```{r}
+data$NASCITA[c(43, 61, 34)] = as.Date(c("1928/03/16","1922/07/04","1929/07/13"))
+data$NASCITA
+```
+
+**SEX**
+
+Per la variabile sex deicdiamo di modificare i valori numerici 1 e 2 in due stringhe, utilizzando la documentazione.
+
+```{r}
+data$SEX <- ifelse(data$SEX == 1, "uomo", "donna")
+data$SEX
+```
+
+**STATCIV**
+
+Anche per questa variabili modifichiamo i valori numerici, utilizzando la documentazione
+
+```{r}
+data$STATCIV <- ifelse(data$STATCIV == 1, "non_sposato\a", 
+                        ifelse(data$STATCIV == 2, "coniugato\a",
+                               ifelse(data$STATCIV == 3, "convivente",
+                                      ifelse(data$STATCIV == 4, "divorziato\a",
+                                             ifelse(data$STATCIV == 5, "vedovo\a",'NAN')))))
+data$STATCIV
+```
+
+Non ci sono valori nulli e tutti i campi sono stati corretti
+
+Facciamo notare come questa operazione non sia indispensabile, in alcuni domini di applicazioni e con determinate metodologie come il Machine Learning non vada sempre svolta.
+
+**Peso**
+
+Osservando la distribuzione della la variabile Peso ci sono dei valori -1 , andiamo a modificarli in valori mancanti e contiamo i valori nulli.
+
+```{r}
+data$PESO =ifelse(data$PESO==-1,NA,data$PESO)
+sum(is.na(data$PESO) | data$PESO == "NA")
+
+```
+
+Osserviamo la nuova stribuzione.
+
+```{r}
+boxplot(data$PESO, 
+        col = "grey",   
+        border = "black",  
+        names = c("PESO"),
+        ylab = "PESO",     
+        pch = 19,
+        main= "Distribuzione MMSE") 
+points(x = rep(1, length(data$PESO)), y = data$PESO, pch = 19, col = "red")
+legend("topright", legend = "Pazienti", pch = 19, col = "red")
+```
+
+Notiamo come ci siano alcuni outlier, soprattutto una paziente che pesa 33kg, osservando pero i valori delle altre colonne ed anche l'età avanzata di molti pazienti che escono fuori dalla boxplot, decidiamo momentaneamente di non eliminare l'osservazione.
+
+**ALTEZZA**
+
+Nella variabile Altezza, ci sono due valori -1 e 9 che vanno corretti, poichè valori scorretti.
+
+```{r}
+data$ALTEZZA = ifelse(data$ALTEZZA< 100,NA,data$ALTEZZA)
+data$ALTEZZA
+```
+
+Andiamo ad osservare la distribuzione
+
+```{r}
+boxplot(data$ALTEZZA, 
+        col = "grey",   
+        border = "black",  
+        names = c("ALTEZZA"),
+        ylab = "ALTEZZA",     
+        pch = 19,
+        main= "Distribuzione ALTEZZA") 
+points(x = rep(1, length(data$ALTEZZA)), y = data$ALTEZZA, pch = 19, col = "red")
+legend("topright", legend = "Pazienti", pch = 19, col = "red")
+```
+
+C'è un solo outlier di un paziente alto 135 cm, ma osservando il suo peso e altri valori, momentaneamente non lo elminiamo.
+
+**CADUTE**
+
+Per la variabile Cadute ci sono valori anomali corrispondenti a -1, procediamo a corregerli.
+
+```{r}
+data$CADUTE = ifelse(data$CADUTE<0,NA,data$CADUTE)
+data$CADUTE
+```
+
+**CCSCORE**
+
+La variabile CCSCORE non sembra presentare problemi
+
+```{r}
+data$CCSCORE
+```
+
+**SOFAING**
+
+La variabile SOFAING non sempre presentare valori anomali
+
+```{r}
+data$SOFAING
+```
+
+**MMSE**
+
+Per questa variabile ci sono dei valori corrispondenti a -1=mancante e -2=non valutabile inoltre alcuni valori hanno le virgole altri i punti, procediamo a corregerli
+
+```{r}
+data$MMSE = ifelse(data$MMSE<0,NA,data$MMSE)
+data$MMSE = str_replace(data$MMSE, ",", ".")
+data$MMSE = as.numeric(data$MMSE)
+data$MMSE
+```
+
+```{r}
+boxplot(data$MMSE, 
+        col = "grey",   
+        border = "black",  
+        names = c("MMSE"),
+        ylab = "MMSE",     
+        pch = 19,
+        main= "Distribuzione MMSE") 
+points(x = rep(1, length(data$MMSE)), y = data$MMSE, pch = 19, col = "red")
+legend("topright", legend = "Pazienti", pch = 19, col = "red")
+```
+
+Ci possono essere valori uguali a 00???
+
+**ALB**
+
+La variabile ALB presenta valori -1 e formati differenti nei valori, prcoediamo a formalizzare il tutto
+
+```{r}
+data$ALB = ifelse(data$ALB==-1,NA,data$ALB)
+data$ALB = str_replace(data$ALB, ",", ".")
+data$ALB = as.numeric(data$ALB)
+data$ALB
+```
+
+Controlliamo la distribuzione
+
+```{r}
+boxplot(data$ALB, 
+        col = "grey",   
+        border = "black",  
+        names = c("ALB"),
+        ylab = "ALB",     
+        pch = 19,
+        main= "Distribuzione ALB")   
+points(x = rep(1, length(data$ALB)), y = data$ALB, pch = 19, col = "red")
+legend("topright", legend = "Pazienti", pch = 19, col = "red")
+```
+
+**CALC**
+
+Per questa variabile c'è da sostituire le virgole con i punti.
+
+```{r}
+data$CALC = str_replace(data$CALC, ",", ".")
+data$CALC = as.numeric(data$CALC)
+data$CALC
+```
+
+Notiamo un valore pari a 880, probabilmente un errore di battitura, correggiamo dividendo per 100
+
+```{r}
+data$CALC[23]= data$CALC[23]/100
+```
+
+Osservaimo la distribuzione
+
+```{r}
+boxplot(data$CALC, 
+        col = "grey",   
+        border = "black",  
+        names = c("CALC"),
+        ylab = "CALC",     
+        pch = 19,
+        main= "Distribuzione CALC")
+points(x = rep(1, length(data$CALC)), y = data$CALC, pch = 19, col = "red")
+legend("topright", legend = "Pazienti", pch = 19, col = "red")
+```
+
+**VITD**
+
+Ci sono diversi valori da correggere come i -1 e cambiare le virgole in punti
+
+```{r}
+data$VITD = str_replace(data$VITD, ",", ".")
+data$VITD = ifelse(data$VITD==-1,NA,data$VITD)
+data$VITD = as.numeric(data$VITD)
+data$VITD
+```
+
+Osserviamo la distribuzione
+
+```{r}
+boxplot(data$VITD, 
+        col = "grey",   
+        border = "black",  
+        names = c("VITD"),
+        ylab = "VITD",     
+        pch = 19,
+        main= "Distribuzione VITD")
+points(x = rep(1, length(data$VITD)), y = data$VITD, pch = 19, col = "red")
+legend("topright", legend = "Pazienti", pch = 19, col = "red")
+```
+
+Ci sono 3 outlier.
+
+**HBING**
+
+Cambiamo le virgole in punti
+
+```{r}
+data$HBING = str_replace(data$HBING, ",", ".")
+data$HBING = as.numeric(data$HBING)
+data$HBING
+```
+
+OSserviamo la distribuzione
+
+```{r}
+boxplot(data$HBING, 
+        col = "grey",   
+        border = "black",  
+        names = c("HBING"),
+        ylab = "HBING",     
+        pch = 19,
+        main= "Distribuzione HBING")
+points(x = rep(1, length(data$HBING)), y = data$HBING, pch = 19, col = "red")
+legend("topright", legend = "Pazienti", pch = 19, col = "red")
+```
+
+**TEMPRIC**
+
+Nella variabile ci sono dei -1 riferiti al valore non disponibile e -2 dato che indica la provenienza del paziente da un altro ospedale, li correggiamo come come NA.
+
+```{r}
+data$TEMPRIC = ifelse(data$TEMPRIC<0,NA,data$TEMPRIC)
+data$TEMPRIC
+```
+
+```{r}
+boxplot(data$TEMPRIC, 
+        col = "grey",   
+        border = "black",  
+        names = c("TEMPRIC"),
+        ylab = "TEMPRIC",     
+        pch = 19,
+        main= "Distribuzione TEMPRIC")
+points(x = rep(1, length(data$TEMPRIC)), y = data$TEMPRIC, pch = 19, col = "red")
+legend("topright", legend = "Pazienti", pch = 19, col = "red")
+```
+
+**DATADIM**
+
+Per questa variabili non ci sono errori da corregre
+
+```{r}
+data$DATDIM
+```
+
+**DATAINT**
+
+Anche per questa variabile non ci sono errori da corregere, ma confrontando alcune osservazioni con la colonna della data dimissione notiamo come per due pazeinti la data di dimissione è prima della data di intervento.
+
+```{r}
+errors <- ifelse(difftime(data$DATDIM, data$DATINT, units = "days") >= 0, TRUE, FALSE)
+indici <- which(!errors)
+data[indici, ]
+nrow(data)
+```
+
+Possiamo eliminare le righe dei due pazienti o eliminare la data di dimissione, scegliamo la seconda opzione.
+
+```{r}
+#Cancellare le righe
+#data <- subset(data, !(PAZIENTE %in% c(29, 145)))
+# Seleziona le righe in cui data$PAZIENTE è uguale a 29 o 145
+indice <- which(data$PAZIENTE == 29 | data$PAZIENTE == 145)
+
+# Trasforma i valori della colonna data$DATDIM in NA per le righe selezionate
+data$DATDIM[indice] <- NA
+data$DATDIM
+nrow(data)
+
+```
+
+**INTDURAT**
+
+Per questa variabile non sembrano ci siano errori anomali o valori mancanti
+
+```{r}
+data$INTDURAT
+```
+
+Osserviamo la distribuzione
+
+```{r}
+boxplot(data$INTDURAT, 
+        col = "grey",   
+        border = "black",  
+        names = c("INTDURAT"),
+        ylab = "INTDURAT",     
+        pch = 19,
+        main= "Distribuzione INTDURAT")
+points(x = rep(1, length(data$INTDURAT)), y = data$INTDURAT, pch = 19, col = "red")
+legend("topright", legend = "Pazienti", pch = 19, col = "red")
+```
+
+**ANEST**
+
+Cambiamo i valori della variabile ANEST utilizzando la documentazione
+
+```{r}
+nuovi_valori <- c("generale", "spinale", "peridurale", "plessica", "combinata", "sedazione", "locale_assistita", "altro")
+
+data$ANEST <- ifelse(data$ANEST == 1, nuovi_valori[1], 
+                     ifelse(data$ANEST == 2, nuovi_valori[2], 
+                            ifelse(data$ANEST == 3, nuovi_valori[3], 
+                                   ifelse(data$ANEST == 4, nuovi_valori[4], 
+                                          ifelse(data$ANEST == 5, nuovi_valori[5], 
+                                                 ifelse(data$ANEST == 6, nuovi_valori[6], 
+                                                        ifelse(data$ANEST == 7, nuovi_valori[7], 
+                                                               ifelse(data$ANEST == 8, nuovi_valori[8], 
+                                                                      data$ANEST))))))))
+data$ANEST
+```
+
+**DATA DECESSO**
+
+In questa variabile ci sono molteplici errori: -alcuni valori sono uguali a-1 -un valore uguale a : 'SI é RIFIUTATA' -Le date come per la variabile NASCITE vengono lette male -La variabile non è numerica Correggiamo tutti gli errori
+```{r}
+data$'DATA DECESSO'
+```
+
+
+
+```{r}
+data$'DATA DECESSO' = ifelse(data$`DATA DECESSO`=='SI è RIFIUTATA',NA,data$`DATA DECESSO`)
+data$'DATA DECESSO' = ifelse(data$`DATA DECESSO`== -1,NA,data$`DATA DECESSO`)
+data$'DATA DECESSO' = as.numeric(data$`DATA DECESSO`)
+(data$'DATA DECESSO' = as.Date(x = data$`DATA DECESSO`,origin = "1899-12-30", ))
+data$'DATA DECESSO'
+```
+
+Abbiamo concluso la fase di cleaning, ogni variabile è stata ripulita, prima di svolgere le nostre analisi sarebbe utile creare nuove variabili che potrebbero servirci
+
+# Pre Processing
+
+In questa fase andiamo a creare  delle nuove variabili per il vostro dataset che ci serviranno per le nostre analisi.
+Andiamo a creare nuove colonne utilizzando le classi per i punteggi.
+Prima il CCSCORE doviso in tre classi: basso,medio,alto.
+
+**CCSCORE_classe**
+```{r}
+data$CCSCORE<-as.numeric(data$CCSCORE)
+data$CCSCORE_classe = ifelse((data$CCSCORE==0 |data$CCSCORE==1 |data$CCSCORE==2),'cc_basso',
+ifelse((data$CCSCORE==3|data$CCSCORE==4),'cc_medio','cc_alto'))
+(table(data$CCSCORE_classe))
+```
+**SOFAING_classe**
+Per il punteggio SOFAING sono state create due classi: basso e alto.
+```{r}
+data$SOFAING_classe = ifelse(data$SOFAING== '0','sofa_basso', 'sofa_alto')
+table(data$SOFAING_classe)
+```
+Creiamo la variabile BMI ed anche la classe
+
+*BMI e BMI_classe**
+
+```{r}
+data$PESO<-as.numeric(data$PESO)
+data$ALTEZZA<-as.numeric(data$ALTEZZA)
+data$BMI<-(data$PESO)/((data$ALTEZZA/100)^2)
+data$BMI_classi = ifelse(data$BMI<18.5,'sottopeso',ifelse(data$BMI<25,'normopeso','sovrappeso'))
+head(data$BMI)
+table(data$BMI_classi)
+```
+Calcoliamo l'età dei pazient, assumento la data intervento come riferimento per il calcolo
+
+**AGE e AGE_classe**
+
+```{r}
+# calculate the age in years
+data$AGE <- as.numeric(difftime(data$DATINT, data$NASCITA, units = "weeks")) / 52.25
+data$AGE <- trunc(data$AGE)
+cat("data$AGE =", data$AGE, "\n")
+```
+Dividamo in classi anche questa variabile
+```{r}
+# create breakpoints for age classes
+breakpoints <- c(70, 75, 80, 85, 90, 95, 100)
+# divide the AGE variable into age classes
+data$AGE_classi <- cut(data$AGE, breakpoints, labels = c("70-75", "75-80", "80-85", "85-90", "90-95", "95-100+"))
+table(data$AGE_classi)
+```
+
+**GGOSSERV e ANNIOSSERV**
+
+Infine andiamo a calcolare i giorni che il paziente rimane in osservazione dalla durata dell'intervento ad una data decisa a priori, che assumiamo sia sotto osservazione della clinica, questa variabile ci servirà per la curva di sopravvivenza.
+```{r}
+
+data$fine_data = ifelse(is.na(data$`DATA DECESSO`),NA,data$`DATA DECESSO`)
+data$fine_data =as.numeric(data$fine_data)
+data$fine_data =as.Date(data$fine_data,origin = "1970-01-01", )
+data$fine_data = ifelse(is.na(data$fine_data),as.Date("2021/12/31"),data$fine_data)
+data$fine_data =as.Date(data$fine_data,origin = "1970-01-01", )
+
+```
+
+```{r}
+data$GGOSSERV = as.numeric(difftime(data$fine_data, data$DATINT, units = "days"))
+data$GGOSSERV
+```
+Osservo due valori negativi, quindi questo significa che ci sono due date incongruenti tra data decesso ed intervento, la data di decesso è un dato molto importante e significativo, decidiamo quindi di eliminare tutti i dati riguardanti questi pazienti per non influire sulle nostre analisi.
+
+```{r}
+data <- subset(data, GGOSSERV>=0)
+```
+
+Creiamo anche la variabile ANNIOSSERV
+```{r}
+data$ANNIOSSERV<- data$GGOSSERV/365
+data$ANNIOSSERV <- trunc(data$ANNIOSSERV)
+cat("data$ANNIOSSERV =", data$ANNIOSSERV, "\n")
+```
+
+#Exploratory data analysis
+
