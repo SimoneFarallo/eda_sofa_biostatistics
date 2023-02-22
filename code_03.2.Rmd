@@ -75,7 +75,7 @@ library(ggplot2)
 Settiamo la directory.
 
 ```{r}
-setwd("C:/Users/Simone/Documents/Desktop/BIOSTATISTICA")
+setwd("C:/Users/Simone/Documents/Desktop/EDA_SOFA-Biostatistic")
 ```
 
 # Data loading
@@ -545,11 +545,15 @@ cat("data$AGE =", data$AGE, "\n")
 Dividamo in classi anche questa variabile
 ```{r}
 # create breakpoints for age classes
-breakpoints <- c(70, 75, 80, 85, 90, 95, 100)
+breakpoints <- c(69, 75, 80, 85, 90, 95, 105)
 # divide the AGE variable into age classes
 data$AGE_classi <- cut(data$AGE, breakpoints, labels = c("70-75", "75-80", "80-85", "85-90", "90-95", "95-100+"))
 table(data$AGE_classi)
 ```
+```{r}
+data$AGE_classi
+```
+
 
 **GGOSSERV e ANNIOSSERV**
 
@@ -582,4 +586,104 @@ cat("data$ANNIOSSERV =", data$ANNIOSSERV, "\n")
 ```
 
 #Exploratory data analysis
+
+Per prima cosa analizziamo i missing value
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Calcola il numero di valori nulli per ogni colonna
+null_counts <- sapply(data, function(x) sum(is.na(x)))
+
+# Calcola le percentuali di valori nulli per ogni colonna
+null_percents <- null_counts / nrow(data) * 100
+
+# Crea un dataframe con i valori delle colonne
+null_data <- data.frame(col = names(data), count = null_counts, percent = null_percents)
+
+# Filtra le colonne con valore nulli
+null_data <- null_data %>% filter(count > 0)
+
+# Ordina il dataframe in base al numero di valori mancanti
+null_data <- null_data[order(null_data$count, decreasing = TRUE),]
+
+# Crea il grafico a barre orizzontale
+ggplot(null_data, aes(x = reorder(col, -count), y = count, fill = "lightpink")) +
+  geom_bar(stat = "identity") +
+  ggtitle("Numero e percentuale di valori mancanti per variabile") +
+  xlab("Variabile") +
+  ylab("Numero di valori mancanti") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1),
+        legend.position = "none") +
+  scale_fill_brewer(palette = "Set2") +
+  geom_text(aes(label = paste0(round(percent, 1), "%")), 
+            hjust = -0.1, size = 3, color = "black") +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, max(null_data$count)))
+
+```
+
+Questa osservazione la si può fare per individuare quali variabili, in fase di analisi, potranno portare a
+distorsioni nei risultati per dati mancanti. Ovviamente la data decesso è quella che contiene maggiori NA
+in quanto non tutti i pazienti sono deceduti. Infatti questa tecnica è più utile in variabili conteggio dove è
+necessario andare ad indagare più approfonditamente i risultati.
+
+**Distribuzione di genere**
+Andiamo ad analizzare le distribuzioni di genere in base alle variabili più importanti.
+Prima di osserviamo il numero di donne e uomini presenti nel dataset
+```{r}
+# Calcola il numero di donne e uomini
+sex_counts <- table(data$SEX)
+
+# Crea il barplot
+barplot(sex_counts, 
+        main = "Distribuzione di genere nel dataset", 
+        xlab = "Genere", 
+        ylab = "Numero di individui", 
+        col = c("lightpink", "steelblue"))
+```
+
+
+```{r}
+ggplot(data, aes(x = AGE_classi, fill = SEX)) +
+  geom_bar(position = "dodge") +
+  facet_grid(. ~ SEX) +
+  ggtitle("Distribuzione del genere e delle classi di età") +
+  xlab("Classe di età") +
+  ylab("Conteggio") +
+  scale_fill_brewer(palette = "Set2")
+```
+
+
+```{r}
+ggplot(data, aes(x = BMI_classi, fill = SEX)) +
+  geom_bar(position = "dodge") +
+  facet_grid(. ~ SEX) +
+  ggtitle("Distribuzione del genere per le classi  BMI") +
+  xlab("Classe di età") +
+  ylab("Conteggio") +
+  scale_fill_brewer(palette = "Set2")
+```
+
+
+```{r}
+ggplot(data, aes(x = SOFAING_classe, fill = SEX)) +
+  geom_bar(position = "dodge") +
+  facet_grid(. ~ SEX) +
+  ggtitle("Distribuzione del genere per le classi  SOFA score") +
+  xlab("Classe di età") +
+  ylab("Conteggio") +
+  scale_fill_brewer(palette = "Set2")
+```
+```{r}
+ggplot(data, aes(x = CCSCORE_classe, fill = SEX)) +
+  geom_bar(position = "dodge") +
+  facet_grid(. ~ SEX) +
+  ggtitle("Distribuzione del genere per le classi  CCSCORE") +
+  xlab("Classe di età") +
+  ylab("Conteggio") +
+  scale_fill_brewer(palette = "Set2")
+```
 
