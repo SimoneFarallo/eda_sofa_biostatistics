@@ -69,6 +69,9 @@ library(readxl)
 library(stringr)
 #Visualization
 library(ggplot2)
+#Descriptive
+install.packages("table1")
+library(table1)
 
 ```
 
@@ -586,7 +589,9 @@ cat("data$ANNIOSSERV =", data$ANNIOSSERV, "\n")
 ```
 
 #Exploratory data analysis
+bla bla
 
+**Missing values**
 Per prima cosa analizziamo i missing value
 
 ```{r}
@@ -662,7 +667,19 @@ ggplot(data, aes(x = BMI_classi, fill = SEX)) +
   geom_bar(position = "dodge") +
   facet_grid(. ~ SEX) +
   ggtitle("Distribuzione del genere per le classi  BMI") +
-  xlab("Classe di età") +
+  xlab("BMI") +
+  ylab("Conteggio") +
+  scale_fill_brewer(palette = "Set2")
+```
+
+
+
+```{r}
+ggplot(data, aes(x = CCSCORE_classe, fill = SEX)) +
+  geom_bar(position = "dodge") +
+  facet_grid(. ~ SEX) +
+  ggtitle("Distribuzione del genere per le classi  CCSCORE") +
+  xlab("CCSCORE") +
   ylab("Conteggio") +
   scale_fill_brewer(palette = "Set2")
 ```
@@ -673,17 +690,193 @@ ggplot(data, aes(x = SOFAING_classe, fill = SEX)) +
   geom_bar(position = "dodge") +
   facet_grid(. ~ SEX) +
   ggtitle("Distribuzione del genere per le classi  SOFA score") +
+  xlab("SOFA") +
+  ylab("Conteggio") +
+  scale_fill_brewer(palette = "Set2")
+```
+
+
+**Distribuzione classi di età**
+
+```{r}
+# Calcola il numero di donne e uomini
+age_count <- table(data$AGE_classi)
+
+# Crea il barplot
+barplot(age_count, 
+        main = "Distribuzione classi di età nel dataset", 
+        xlab = "Classi d'età", 
+        ylab = "Numero di individui", 
+        col = c( "lightblue"))
+```
+
+```{r}
+ggplot(data, aes(x = BMI_classi, fill = AGE_classi)) +
+  geom_bar(position = "dodge") +
+  ggtitle("Distribuzione del genere per le classi  BMI") +
   xlab("Classe di età") +
   ylab("Conteggio") +
   scale_fill_brewer(palette = "Set2")
 ```
+
+
 ```{r}
-ggplot(data, aes(x = CCSCORE_classe, fill = SEX)) +
+ggplot(data, aes(x = CCSCORE_classe, fill = AGE_classi)) +
   geom_bar(position = "dodge") +
-  facet_grid(. ~ SEX) +
   ggtitle("Distribuzione del genere per le classi  CCSCORE") +
   xlab("Classe di età") +
   ylab("Conteggio") +
   scale_fill_brewer(palette = "Set2")
 ```
+
+
+```{r}
+ggplot(data, aes(x = SOFAING_classe, fill = AGE_classi)) +
+  geom_bar(position = "dodge") +
+  ggtitle("Distribuzione del genere per le classi  SOFA") +
+  xlab("Classe di età") +
+  ylab("Conteggio") +
+  scale_fill_brewer(palette = "Set2")
+  
+```
+
+
+**Funzione cumulata per SOFA e CCSCORE**
+
+```{r}
+#funzione empirica cumulata dell'età divisa per sesso
+data$SOFAING = as.numeric(data$SOFAING)
+a <- ggplot(data, aes(x = SOFAING))+theme(panel.background = element_rect(fill = "white" ))+ ggtitle("Plot of length \n by dose") + ylab("età cumulata") + xlab("Sofa")
+
+#funzione empirica cumulata
+pl =a + stat_ecdf(aes(color = SEX,linetype = SEX),
+
+geom = "step", size = 1.5) +
+
+scale_color_manual(values = c("lightpink", "steelblue"))+
+labs(y = "f(eta)")+theme(panel.background = element_rect(fill = "white" ))
+
+bxp <- pl + labs(title = "Cumulate età-Sofa",
+
+subtitle = "Frequenze cumulate punteggio sofa per età e genere",
+x = "Punteggio Sofa", y = "Frequenza cumulata età")
+
+bxp
+```
+```{r}
+#funzione empirica cumulata dell'età divisa per sesso
+data$SOFAING = as.numeric(data$CCSCORE)
+a <- ggplot(data, aes(x = CCSCORE))+theme(panel.background = element_rect(fill = "white" ))+ ggtitle("Plot of length \n by dose") + ylab("età cumulata") + xlab("CCSCORE")
+
+#funzione empirica cumulata
+pl =a + stat_ecdf(aes(color = SEX,linetype = SEX),
+
+geom = "step", size = 1.5) +
+
+scale_color_manual(values = c("lightpink", "steelblue"))+
+labs(y = "f(eta)")+theme(panel.background = element_rect(fill = "white" ))
+
+bxp <- pl + labs(title = "Cumulate età-CCSCORE",
+
+subtitle = "Frequenze cumulate punteggio CCSCORE
+per età e genere",
+x = "Punteggio CCSCORE", y = "Frequenza cumulata età")
+
+bxp
+```
+
+**Classificazione variabili principali rispetto a SOFA e CCSCORE**
+```{r}
+pvalue <- function(x, ...) {
+    # Construct vectors of data y, and groups (strata) g
+    y <- unlist(x)
+    g <- factor(rep(1:length(x), times=sapply(x, length)))
+    if (is.numeric(y)) {
+        # For numeric variables, perform a standard 2-sample t-test
+        p <- t.test(y ~ g)$p.value
+    } else {
+        # For categorical variables, perform a chi-squared test of independence
+        p <- chisq.test(table(y, g))$p.value
+    }
+    # Format the p-value, using an HTML entity for the less-than sign.
+    # The initial empty string places the output on the line below the variable label.
+    c("", sub("<", "&lt;", format.pval(p, digits=3, eps=0.001)))
+}
+
+table1(~ SEX + AGE  + AGE_classi + BMI + BMI_classi  + CCSCORE_classe  | SOFAING_classe, data=data, overall=F, extra.col=list('P-value'=pvalue))
+```
+
+
+```{r}
+pvalue <- function(x, ...) {
+    # Construct vectors of data y, and groups (strata) g
+    y <- unlist(x)
+    g <- factor(rep(1:length(x), times=sapply(x, length)))
+    if (is.numeric(y)) {
+        # For numeric variables, perform a standard 2-sample t-test
+        p <- t.test(y ~ g)$p.value
+    } else {
+        # For categorical variables, perform a chi-squared test of independence
+        p <- chisq.test(table(y, g))$p.value
+    }
+    # Format the p-value, using an HTML entity for the less-than sign.
+    # The initial empty string places the output on the line below the variable label.
+    c("", sub("<", "&lt;", format.pval(p, digits=3, eps=0.001)))
+}
+
+# create a new function for the inverted grouping factors
+pvalue_inverted <- function(x, ...) {
+    # Construct vectors of data y, and groups (strata) g
+    y <- unlist(x)
+    g <- factor(rep(1:length(x), times=sapply(x, length)))
+    if (is.numeric(y)) {
+        # For numeric variables, perform an ANOVA test
+        p <- anova(lm(y ~ g))$"Pr(>F)"[1]
+    } else {
+        # For categorical variables, perform a chi-squared test of independence
+        p <- chisq.test(table(g, y))$p.value
+    }
+    # Format the p-value, using an HTML entity for the less-than sign.
+    # The initial empty string places the output on the line below the variable label.
+    c("", sub("<", "&lt;", format.pval(p, digits=3, eps=0.001)))
+}
+
+# use the new function for the inverted grouping factors
+table1(~ SEX + AGE + AGE_classi + BMI + BMI_classi + SOFAING_classe | CCSCORE_classe, data = data, overall = FALSE, extra.col = list('P-value' = pvalue_inverted))
+
+```
+
+
+**CCSCORE e SOFA**
+
+Andiamo ad analizzare nello specifico i due punteggi CCSCORE e SOFA
+```{r}
+table1(~ CCSCORE_classe | SOFAING_classe*SEX, data=data,overall=F, extra.col=list('P-value'=pvalue))
+```
+
+
+```{r}
+
+my_colors <- c("lightblue", "steelblue")
+
+ggplot(data, aes(x = SOFAING_classe, y = CCSCORE, fill = SOFAING_classe)) +
+  geom_violin(trim = FALSE, scale = "width") +
+  stat_boxplot(geom = 'errorbar', width = 0.2, notch = TRUE, varwidth = TRUE) +
+  stat_summary(fun.y = median, geom = "point", shape = 21, size = 3, color = "white", fill = "red") +
+  stat_summary(fun.y = mean, geom = "point", shape = 23, size = 3, color = "white", fill = "black") +
+  geom_jitter(position = position_jitter(0.1), size = 0.5, alpha = 0.5) +
+  scale_fill_manual(values = my_colors) +
+  labs(x = " ", y = "CCSCORE") +
+  ggtitle("Violin plot per ogni categoria di SOFA") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+        legend.position = "none")
+
+```
+
+
+
 
