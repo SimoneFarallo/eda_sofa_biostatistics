@@ -2,13 +2,13 @@
 title: "Biostatistica's Project"
 author: "Simone Farallo & Michele Salvaterra"
 output:
+  pdf_document:
+    toc: yes
   html_document:
     toc: yes
     fig_caption: yes
     theme: flatly
     css: styles.css
-  pdf_document:
-    toc: yes
 ---
 
 # Abstract
@@ -69,9 +69,10 @@ library(readxl)
 library(stringr)
 #Visualization
 library(ggplot2)
+library(psych)
 #Descriptive
-install.packages("table1")
 library(table1)
+library(corrplot)
 
 ```
 
@@ -525,6 +526,20 @@ table(data$SOFAING_classe)
 ```
 Creiamo la variabile BMI ed anche la classe
 
+**MMSE_classe**
+Dividamo il punteggio MMSE_classe
+```{r}
+data$MMSE_classe <- data$MMSE
+
+# Raggruppare i punteggi in classi
+data$MMSE_classe <- cut(data$MMSE, breaks = c(0, 9, 18, 23, 30), 
+                                    labels = c("grave", "moderato", "lieve", "normale"))
+
+# Visualizzare il conteggio di osservazioni in ogni classe
+table(data$MMSE_classe)
+```
+
+
 *BMI e BMI_classe**
 
 ```{r}
@@ -695,6 +710,15 @@ ggplot(data, aes(x = SOFAING_classe, fill = SEX)) +
   scale_fill_brewer(palette = "Set2")
 ```
 
+```{r}
+ggplot(data, aes(x = MMSE_classe, fill = SEX)) +
+  geom_bar(position = "dodge") +
+  facet_grid(. ~ SEX) +
+  ggtitle("Distribuzione del genere e delle classi di MMSE") +
+  xlab("MSE") +
+  ylab("Conteggio") +
+  scale_fill_brewer(palette = "Set2")
+```
 
 **Distribuzione classi di età**
 
@@ -740,6 +764,15 @@ ggplot(data, aes(x = SOFAING_classe, fill = AGE_classi)) +
   
 ```
 
+```{r}
+ggplot(data, aes(x = MMSE_classe, fill = AGE_classi)) +
+  geom_bar(position = "dodge") +
+  ggtitle("Distribuzione del genere per le classi MMSE") +
+  xlab("MSE") +
+  ylab("Conteggio") +
+  scale_fill_brewer(palette = "Set2")
+```
+
 
 **Funzione cumulata per SOFA e CCSCORE**
 
@@ -763,6 +796,8 @@ x = "Punteggio Sofa", y = "Frequenza cumulata età")
 
 bxp
 ```
+
+
 ```{r}
 #funzione empirica cumulata dell'età divisa per sesso
 data$SOFAING = as.numeric(data$CCSCORE)
@@ -803,7 +838,7 @@ pvalue <- function(x, ...) {
     c("", sub("<", "&lt;", format.pval(p, digits=3, eps=0.001)))
 }
 
-table1(~ SEX + AGE  + AGE_classi + BMI + BMI_classi  + CCSCORE_classe  | SOFAING_classe, data=data, overall=F, extra.col=list('P-value'=pvalue))
+table1(~ SEX + AGE  + AGE_classi + BMI + BMI_classi  + MMSE_classe + CCSCORE_classe  | SOFAING_classe, data=data, overall=F, extra.col=list('P-value'=pvalue))
 ```
 
 
@@ -842,7 +877,7 @@ pvalue_inverted <- function(x, ...) {
 }
 
 # use the new function for the inverted grouping factors
-table1(~ SEX + AGE + AGE_classi + BMI + BMI_classi + SOFAING_classe | CCSCORE_classe, data = data, overall = FALSE, extra.col = list('P-value' = pvalue_inverted))
+table1(~ SEX + AGE + AGE_classi + BMI + BMI_classi + MMSE_classe +SOFAING_classe | CCSCORE_classe, data = data, overall = FALSE, extra.col = list('P-value' = pvalue_inverted))
 
 ```
 
@@ -853,7 +888,6 @@ Andiamo ad analizzare nello specifico i due punteggi CCSCORE e SOFA
 ```{r}
 table1(~ CCSCORE_classe | SOFAING_classe*SEX, data=data,overall=F, extra.col=list('P-value'=pvalue))
 ```
-
 
 ```{r}
 
@@ -876,6 +910,34 @@ ggplot(data, aes(x = SOFAING_classe, y = CCSCORE, fill = SOFAING_classe)) +
         legend.position = "none")
 
 ```
+**Analisi correlazione**
+
+
+```{r}
+
+data_num <- select_if(data, is.numeric)#Prendo solo variabili numeriche
+data_num <- subset(data_num, select = -PAZIENTE) # Elimino la variabile PAziente
+corr<-cor(na.omit(data_num))# Elimino NA
+corr
+```
+```{r}
+pairs.panels(data_num, ellipses = F, lm=T,bg = c('blue','pink')[data$SEX],pch= 21, stars=FALSE, cex = 1)
+```
+
+
+
+
+```{r}
+# Visualizzazione della matrice di correlazione
+par(mar=c(0,0,2,0))
+corrplot(corr, method = "color", type = "lower", order = "hclust",
+addCoef.col = "black", number.cex = 0.3,
+diag = FALSE, tl.cex = 0.9, tl.srt = 90,
+cl.cex = 0.5, cl.pos = "n")
+```
+
+
+
 
 
 
