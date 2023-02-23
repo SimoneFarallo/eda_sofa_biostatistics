@@ -73,6 +73,8 @@ library(psych)
 #Descriptive
 library(table1)
 library(corrplot)
+#Analisi di sopravvivenza
+library(survival)
 
 ```
 
@@ -937,8 +939,20 @@ cl.cex = 0.5, cl.pos = "n")
 ```
 
 
+# Analisi di sopravvivenza
 
-
+Come prima cosa creiamo una variabile 0 e 1 per i decessi, 1=decessi 0=vivi
+```{r}
+data$EVENTO<-ifelse(is.na(data$`DATA DECESSO`), 0,1 )
+data$EVENTO
+```
+```{r}
+# Crea una curva di sopravvivenza con Kaplan-Meier
+fit <- survfit(Surv(ANNIOSSERV, EVENTO) ~ SOFAING_classe, data = data)
+#fit <- survfit(Surv(data$EVENTO, data$SOFAING_classe) ~ 1)
+# Plotta la curva di sopravvivenza
+plot(fit, xlab = "Tempo", ylab = "Sopravvivenza", main = "Curva di sopravvivenza con Kaplan-Meier")
+```
 
 
 
