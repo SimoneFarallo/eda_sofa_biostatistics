@@ -85,7 +85,8 @@ library(table1)
 library(corrplot)
 #Analisi di sopravvivenza
 library(survival)
-
+library(survminer)
+library(ggfortify)
 ```
 
 Impostazione della directory.
@@ -975,14 +976,49 @@ Come prima cosa creiamo una variabile 0 e 1 per i decessi, 1=decessi 0=vivi
 ```{r}
 data$EVENTO<-ifelse(is.na(data$`DATA DECESSO`), 0,1 )
 data$EVENTO
+data_1 <- mutate(data, all = EVENTO != "0")# La funzione mutate() del pacchetto dplyr serve per creare o modificare colonne di un dataframe. In questo caso, la funzione mutate() viene utilizzata per creare una nuova colonna chiamata "all", che assume valore TRUE se l'evento ("EVENTO") del paziente non è "0" e FALSE altrimenti.
 ```
+**Modello di Kaplan-Meier**
+
+Costruiamo la curva di sopravvivenza
 ```{r}
-# Crea una curva di sopravvivenza con Kaplan-Meier
-fit <- survfit(Surv(ANNIOSSERV, EVENTO) ~ SOFAING_classe, data = data)
-#fit <- survfit(Surv(data$EVENTO, data$SOFAING_classe) ~ 1)
-# Plotta la curva di sopravvivenza
-plot(fit, xlab = "Tempo", ylab = "Sopravvivenza", main = "Curva di sopravvivenza con Kaplan-Meier")
+#Curva di sopravvivenza
+curva_soprav <- survfit(Surv(ANNIOSSERV, all) ~ SOFAING_classe, data = data_1)
+table_curva <- fortify(curva_soprav)
+table_curva
 ```
 
+```{r}
+ggsurvplot(curva_soprav, title='Curva di sopravvivenza di Kaplan-Meier',
+           risk.table = TRUE, xlab = "Tempo (Anni)", censor = F, 
+           xlim = c(0,9), break.x.by = 1,
+           palette = c("red", "steelblue"), # Imposta la palette di colori
+           legend.title = "", # Imposta il titolo della legenda
+           legend.labs = c('Sofa Alto','Sofa Basso'), # Imposta le etichette della legenda
+           legend.labs.size = 14, # Imposta la dimensione delle etichette della legenda
+           legend.position = "bottom", # Imposta la posizione della legenda
+           legend.fontsize = 10, # Imposta la dimensione del font della legenda
+           risk.table.col = "black", # Imposta il colore del testo della tabella
+           risk.table.fontsize = 4, # Imposta la dimensione del font del testo della tabella
+           risk.table.title = "Tabella dei rischi", # Imposta il titolo della tabella
+           risk.table.height = 0.3, # Imposta l'altezza della tabella
+           risk.table.width = 0.5) # Imposta la larghezza della tabella
+```
+**Modello di Cox**
+Il modello di Cox è un modello di regressione utilizzato per analizzare la sopravvivenza in base a un insieme di covariate (o variabili esplicative). È un modello semiparametrico in quanto assume solo una distribuzione per il tempo di sopravvivenza, ma non fa alcuna ipotesi sulla forma funzionale della relazione tra covariate e hazard (il rischio di eventi).
+
+Rispetto allo score sofa
+```{r}
+# Esegue il modello di Cox
+cox_SOFA <- coxph(Surv(ANNIOSSERV, all) ~ SOFAING_classe, data = data_1)
+
+# Stampa i risultati
+summary(cox_SOFA)
+```
+Rispetto agli altri score
+```{r}
+cox_GEN <- coxph(Surv(ANNIOSSERV,all)~SOFAING_classe+AGE_classi+BMI_classi+CCSCORE_classe+MMSE_classe,data = data_1)
+summary(cox_GEN)
+```
 
 
