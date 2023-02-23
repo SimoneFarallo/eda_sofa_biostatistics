@@ -12,8 +12,18 @@ output:
 ---
 
 # Abstract
+L’obiettivo di questo progetto è stato quello di partire da un dataset contenente degli errori e ripulirlo da essi attraverso la procedura di cleaning. Successivamente a questo abbiamo studiato le informazioni riguardanti le variabili e abbiamo provato a svolgere un’analisi preliminare di sopravvivenza. In conclusione abbiamo commentato i risultati raggiunti.
 
 # Introduction
+Il team ha lavorato su un progetto dove l'obiettivo era quello di pulire un dataset contenente errori e condurre un'analisi di sopravvivenza.
+
+Il dataset riguarda il punteggio “SOFA”(Sequential Organ Failure Assessment) che è uno strumento utilizzato per valutare la gravità dell'insufficienza di uno o più organi in pazienti in terapia intensiva. Esso viene utilizzato come strumento di valutazione per monitorare il miglioramento o il deterioramento della funzione dell'organo nel tempo.
+ 
+Sottolineiamo che la fase iniziale di cleaning dei dati è fondamentale per qualsiasi tipo di analisi statistica. La presenza di errori o dati mancanti può influire negativamente sui risultati ottenuti e può portare a conclusioni errate.
+
+In secondo luogo, per quanto riguarda l'analisi preliminare di sopravvivenza, è importante considerare che si tratta di un tipo di analisi statistica che si occupa di studiare il tempo che intercorre tra un evento iniziale e un evento finale. Questa analisi richiede l'utilizzo di specifici strumenti statistici, come ad esempio i modelli di regressione di Cox.
+
+Infine, per quanto riguarda la presentazione dei risultati, abbiamo fatto in modo che il lettore possa comprendere facilmente i risultati ottenuti. Inoltre, abbiamo citato le fonti utilizzate e descritto le metodologie utilizzate, in modo che il lavoro possa essere replicato in futuro.
 
 +--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | #### **Variabile** | #### **Tipologia** | #### **Descrizione**                                                                                                                                                                                 |
@@ -76,27 +86,28 @@ library(corrplot)
 
 ```
 
-Settiamo la directory.
+Impostazione della directory.
 
 ```{r}
 setwd("C:/Users/Simone/Documents/Desktop/EDA_SOFA-Biostatistic")
 ```
 
 # Data loading
+Prima fase, caricamento dei dati.
 
 ```{r}
 data <- read_excel("SOFA.xlsx",)
 head(data)
 ```
 
-PRima di svolgere le analisi, Osserviamo la struttura del dataset
+Struttura del dataset.
 
 ```{r}
 #Struttura del dataset
 str(data)
 ```
 
-Osserviamo dei tipi di dati inaddati per alcune colonne come le date o i valori numerici di tipo stringa.
+Si può notare come ci sia la presenza di valori numerici espressi in formato stringa.
 
 ```{r}
 #Statistiche descrittive
@@ -108,22 +119,22 @@ summary(data)
 colSums(is.na(data))
 ```
 
-Osservando i dati notiamo diversi problemi nel dataset come valori mancanti,outlier,ecc inoltre osservando le distribuzioni delle variabili si notano diversi valori anomali e valori da correggere. quindi prima di svolgere le un analisi esplorativa più approfondita, deicidiamod di pulire e preprocessare il dataset.
+Osservando i dati si può notare la presenza di valori mancanti e di outlier, inoltre nelle distribuzioni delle variabili si notano valori anomali e valori che necessitano di una correzione, da queste premesse iniziamo la fase di cleaning e preprocessing del dataset.
 
 # Data Cleaning
 
-Per comodità e data la grandezza del dataset andremo in ordine e corregeremo ogni variabile manualmente.
+Per comodità, data la dimensione del dataset, abbiamo deciso di correggere ogni variabile manualmente.
 
 **Paziente**
 
-Controllo dei duplicati
+Controllo dei duplicati.
 
 ```{r}
 data$PAZIENTE[duplicated(data$PAZIENTE)]
 data[data$PAZIENTE== 16,]
 ```
 
-C'è un duplicato negli id dei pazienti, sembra che ci siano due pazienti diversi con lo stesso id, quindi procediamo a cambiare id.
+Si nota la presenza di due pazienti che hanno lo stesso numero identificativo, dunque la colonna “PAZIENTE” presenta un duplicato, procediamo con la correzzione.
 
 ```{r}
 data[7,1] = 17
@@ -137,7 +148,7 @@ data[data$PAZIENTE==16 | data$PAZIENTE==17,]
 data$NASCITA
 ```
 
-Come già notato in precedenza i valori delle date sono completamente insensati qauesto è dovuto al fatto che R non legga bene i file excel inoltre c'è un valore da correggere per il paziente 111 e tre valori con errori di battitura.
+Come già avevamo notato le date hanno dei valori insensati, questo è dovuto al fatto che R non legge bene i file excel, inoltre c’è un valore da correggere per il paziente 111 e tre valori che contengono errori di battitura.
 
 ```{r}
 (i <- data[data$PAZIENTE==111,])
@@ -150,7 +161,7 @@ data$NASCITA = as.numeric(data$NASCITA)
 (data$NASCITA = as.Date(x = data$NASCITA,origin = "1899-12-30", ))
 ```
 
-Correggiamo i tre valori mancanti che sono i tre errori di battitura osservando la loro posizione nel df.
+Procediamo con la correzione dei tre valori mancanti, che altro non sono che i tre errori di battitura che si possono osservare nel Dataset.
 
 ```{r}
 data$NASCITA[c(43, 61, 34)] = as.Date(c("1928/03/16","1922/07/04","1929/07/13"))
@@ -159,7 +170,7 @@ data$NASCITA
 
 **SEX**
 
-Per la variabile sex deicdiamo di modificare i valori numerici 1 e 2 in due stringhe, utilizzando la documentazione.
+Per la variabile “SEX” decidiamo di modificare i valori numerici 1 e 2 in due stringhe, utilizzando la documentazione.
 
 ```{r}
 data$SEX <- ifelse(data$SEX == 1, "uomo", "donna")
@@ -168,7 +179,7 @@ data$SEX
 
 **STATCIV**
 
-Anche per questa variabili modifichiamo i valori numerici, utilizzando la documentazione
+Come fatto per la variabile precedente, procediamo in modo analogo e utilizzando la documentazione andiamo a modificare i valori numerici.
 
 ```{r}
 data$STATCIV <- ifelse(data$STATCIV == 1, "non_sposato\a", 
@@ -179,13 +190,13 @@ data$STATCIV <- ifelse(data$STATCIV == 1, "non_sposato\a",
 data$STATCIV
 ```
 
-Non ci sono valori nulli e tutti i campi sono stati corretti
+Non ci sono valori nulli e tutti i campi sono stati corretti.
+Bisogna dire che questa operazione non è sempre indispensabile, in alcuni domini di applicazioni e con determinate metodologie, come il Machine Learning, questa non va sempre svolta.
 
-Facciamo notare come questa operazione non sia indispensabile, in alcuni domini di applicazioni e con determinate metodologie come il Machine Learning non vada sempre svolta.
 
 **Peso**
 
-Osservando la distribuzione della la variabile Peso ci sono dei valori -1 , andiamo a modificarli in valori mancanti e contiamo i valori nulli.
+Osservando la distribuzione della variabile “PESO” sono presenti dei valori -1, andiamo a modificarli trasformandoli in valori mancanti e contiamo i valori nulli.
 
 ```{r}
 data$PESO =ifelse(data$PESO==-1,NA,data$PESO)
@@ -193,7 +204,7 @@ sum(is.na(data$PESO) | data$PESO == "NA")
 
 ```
 
-Osserviamo la nuova stribuzione.
+Osserviamo la nuova distribuzione.
 
 ```{r}
 boxplot(data$PESO, 
@@ -207,18 +218,19 @@ points(x = rep(1, length(data$PESO)), y = data$PESO, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
-Notiamo come ci siano alcuni outlier, soprattutto una paziente che pesa 33kg, osservando pero i valori delle altre colonne ed anche l'età avanzata di molti pazienti che escono fuori dalla boxplot, decidiamo momentaneamente di non eliminare l'osservazione.
+Notiamo come ci siano alcuni outlier, soprattutto una paziente ha un peso che equivale a 33kg.
+Osservando però i valori delle altre colonne ed anche l'età avanzata di molti pazienti, come si può vedere facilmente dando uno sguardo al boxplot, decidiamo momentaneamente di non eliminare l'osservazione. (da rivedere sta frase)
 
 **ALTEZZA**
 
-Nella variabile Altezza, ci sono due valori -1 e 9 che vanno corretti, poichè valori scorretti.
+Osservando la variabile "ALTEZZA" si notano due valori "-1" e "9" che necessitano di una correzzione.
 
 ```{r}
 data$ALTEZZA = ifelse(data$ALTEZZA< 100,NA,data$ALTEZZA)
 data$ALTEZZA
 ```
 
-Andiamo ad osservare la distribuzione
+Osserviamo la distribuzione.
 
 ```{r}
 boxplot(data$ALTEZZA, 
@@ -232,11 +244,11 @@ points(x = rep(1, length(data$ALTEZZA)), y = data$ALTEZZA, pch = 19, col = "red"
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
-C'è un solo outlier di un paziente alto 135 cm, ma osservando il suo peso e altri valori, momentaneamente non lo elminiamo.
+C'è un solo outlier di un paziente alto 135 cm, ma osservando il suo peso e altri valori, momentaneamente non lo eliminiamo.
 
 **CADUTE**
 
-Per la variabile Cadute ci sono valori anomali corrispondenti a -1, procediamo a corregerli.
+Per la variabile "CADUTE" ci sono valori anomali corrispondenti a -1, procediamo a corregerli.
 
 ```{r}
 data$CADUTE = ifelse(data$CADUTE<0,NA,data$CADUTE)
@@ -245,7 +257,7 @@ data$CADUTE
 
 **CCSCORE**
 
-La variabile CCSCORE non sembra presentare problemi
+La variabile "CCSCORE" non sembra presentare problemi.
 
 ```{r}
 data$CCSCORE
@@ -253,7 +265,7 @@ data$CCSCORE
 
 **SOFAING**
 
-La variabile SOFAING non sempre presentare valori anomali
+La variabile "SOFAING" non sembra presentare valori anomali
 
 ```{r}
 data$SOFAING
@@ -261,7 +273,7 @@ data$SOFAING
 
 **MMSE**
 
-Per questa variabile ci sono dei valori corrispondenti a -1=mancante e -2=non valutabile inoltre alcuni valori hanno le virgole altri i punti, procediamo a corregerli
+La variabile "MMSE" presenta dei valori corrispondenti a "-1 = mancante" e "-2 = non valutabile", inoltre alcuni valori hanno le virgole ec altri i punti, procediamo a corregerli.
 
 ```{r}
 data$MMSE = ifelse(data$MMSE<0,NA,data$MMSE)
@@ -282,11 +294,11 @@ points(x = rep(1, length(data$MMSE)), y = data$MMSE, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
-Ci possono essere valori uguali a 00???
+Ci possono essere valori uguali a 00??? (bro ma a chi parli? lol)
 
 **ALB**
 
-La variabile ALB presenta valori -1 e formati differenti nei valori, prcoediamo a formalizzare il tutto
+La variabile "ALB" presenta valori "-1" e dei differenti formati che rappresentano i valori, procediamo a formalizzare il tutto.
 
 ```{r}
 data$ALB = ifelse(data$ALB==-1,NA,data$ALB)
@@ -295,7 +307,7 @@ data$ALB = as.numeric(data$ALB)
 data$ALB
 ```
 
-Controlliamo la distribuzione
+Controlliamo la distribuzione.
 
 ```{r}
 boxplot(data$ALB, 
@@ -311,7 +323,7 @@ legend("topright", legend = "Pazienti", pch = 19, col = "red")
 
 **CALC**
 
-Per questa variabile c'è da sostituire le virgole con i punti.
+La variabile "CALC" ha bisogno di sostituire le virgole presenti in esso con dei punti.
 
 ```{r}
 data$CALC = str_replace(data$CALC, ",", ".")
@@ -319,13 +331,13 @@ data$CALC = as.numeric(data$CALC)
 data$CALC
 ```
 
-Notiamo un valore pari a 880, probabilmente un errore di battitura, correggiamo dividendo per 100
+Notiamo un valore pari a 880, probabilmente un errore di battitura, correggiamolo dividendolo per 100.
 
 ```{r}
 data$CALC[23]= data$CALC[23]/100
 ```
 
-Osservaimo la distribuzione
+Osserviamo la distribuzione.
 
 ```{r}
 boxplot(data$CALC, 
@@ -341,7 +353,7 @@ legend("topright", legend = "Pazienti", pch = 19, col = "red")
 
 **VITD**
 
-Ci sono diversi valori da correggere come i -1 e cambiare le virgole in punti
+Ci sono diversi valori da correggere come i valori "-1" e cambiare le virgole in punti.
 
 ```{r}
 data$VITD = str_replace(data$VITD, ",", ".")
@@ -350,7 +362,7 @@ data$VITD = as.numeric(data$VITD)
 data$VITD
 ```
 
-Osserviamo la distribuzione
+Osserviamo la distribuzione.
 
 ```{r}
 boxplot(data$VITD, 
@@ -364,11 +376,11 @@ points(x = rep(1, length(data$VITD)), y = data$VITD, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
-Ci sono 3 outlier.
+Presenza di 3 outlier.
 
 **HBING**
 
-Cambiamo le virgole in punti
+Cambiamo le virgole in punti.
 
 ```{r}
 data$HBING = str_replace(data$HBING, ",", ".")
@@ -376,7 +388,7 @@ data$HBING = as.numeric(data$HBING)
 data$HBING
 ```
 
-OSserviamo la distribuzione
+Osserviamo la distribuzione
 
 ```{r}
 boxplot(data$HBING, 
@@ -392,7 +404,7 @@ legend("topright", legend = "Pazienti", pch = 19, col = "red")
 
 **TEMPRIC**
 
-Nella variabile ci sono dei -1 riferiti al valore non disponibile e -2 dato che indica la provenienza del paziente da un altro ospedale, li correggiamo come come NA.
+Nella variabile "TEMPRIC" ci sono dei "-1" riferiti al valore non disponibile e dei "-2" che indicano la provenienza del paziente da un altro ospedale, procediamo con la correzione trattandoli come "NA".
 
 ```{r}
 data$TEMPRIC = ifelse(data$TEMPRIC<0,NA,data$TEMPRIC)
@@ -413,7 +425,7 @@ legend("topright", legend = "Pazienti", pch = 19, col = "red")
 
 **DATADIM**
 
-Per questa variabili non ci sono errori da corregre
+La variabile "DATADIM" non presenta valori da correggere.
 
 ```{r}
 data$DATDIM
@@ -421,7 +433,7 @@ data$DATDIM
 
 **DATAINT**
 
-Anche per questa variabile non ci sono errori da corregere, ma confrontando alcune osservazioni con la colonna della data dimissione notiamo come per due pazeinti la data di dimissione è prima della data di intervento.
+La variabile "DATAINT" non presenta errori da corregere, ma confrontando alcune osservazioni con la colonna della data di dimissione notiamo come per due pazienti la data di dimissione è prima della data di intervento.
 
 ```{r}
 errors <- ifelse(difftime(data$DATDIM, data$DATINT, units = "days") >= 0, TRUE, FALSE)
@@ -430,7 +442,7 @@ data[indici, ]
 nrow(data)
 ```
 
-Possiamo eliminare le righe dei due pazienti o eliminare la data di dimissione, scegliamo la seconda opzione.
+Possiamo eliminare le righe dei due pazienti o eliminare la data di dimissione, procediamo eliminando la data di dimissione.
 
 ```{r}
 #Cancellare le righe
@@ -447,13 +459,13 @@ nrow(data)
 
 **INTDURAT**
 
-Per questa variabile non sembrano ci siano errori anomali o valori mancanti
+La variabile "INTDURAT" non sembra presetare errori anomali o valori mancanti.
 
 ```{r}
 data$INTDURAT
 ```
 
-Osserviamo la distribuzione
+Osserviamo la distribuzione.
 
 ```{r}
 boxplot(data$INTDURAT, 
@@ -469,7 +481,7 @@ legend("topright", legend = "Pazienti", pch = 19, col = "red")
 
 **ANEST**
 
-Cambiamo i valori della variabile ANEST utilizzando la documentazione
+Cambiamo i valori della variabile "ANEST" utilizzando la documentazione.
 
 ```{r}
 nuovi_valori <- c("generale", "spinale", "peridurale", "plessica", "combinata", "sedazione", "locale_assistita", "altro")
@@ -488,11 +500,13 @@ data$ANEST
 
 **DATA DECESSO**
 
-In questa variabile ci sono molteplici errori: -alcuni valori sono uguali a-1 -un valore uguale a : 'SI é RIFIUTATA' -Le date come per la variabile NASCITE vengono lette male -La variabile non è numerica Correggiamo tutti gli errori
+La variabile “DATA DECESSO” presenta molteplici errori:
+innanzitutto ci sono valori uguali a “-1” che equivalgono a “Si è rifiutata”;
+dopo di che le date sono rappresentate con valori di tipo non numerico(stringa?), procediamo con la correzione di tutti i valori.
+
 ```{r}
 data$'DATA DECESSO'
 ```
-
 
 
 ```{r}
@@ -503,31 +517,38 @@ data$'DATA DECESSO' = as.numeric(data$`DATA DECESSO`)
 data$'DATA DECESSO'
 ```
 
-Abbiamo concluso la fase di cleaning, ogni variabile è stata ripulita, prima di svolgere le nostre analisi sarebbe utile creare nuove variabili che potrebbero servirci
+Abbiamo concluso la fase di cleaning, ogni variabile è stata ripulita, prima di svolgere le nostre analisi sarebbe utile creare nuove variabili che potrebbero servirci di seguito.
 
 # Pre Processing
 
-In questa fase andiamo a creare  delle nuove variabili per il vostro dataset che ci serviranno per le nostre analisi.
+In questa fase andiamo a creare  delle nuove variabili per il nostro dataset che ci serviranno per le analisi future.
 Andiamo a creare nuove colonne utilizzando le classi per i punteggi.
-Prima il CCSCORE doviso in tre classi: basso,medio,alto.
+Per primo dividiamo il "CCSCORE" in tre classi: basso, medio, alto.
 
 **CCSCORE_classe**
+
 ```{r}
 data$CCSCORE<-as.numeric(data$CCSCORE)
 data$CCSCORE_classe = ifelse((data$CCSCORE==0 |data$CCSCORE==1 |data$CCSCORE==2),'cc_basso',
 ifelse((data$CCSCORE==3|data$CCSCORE==4),'cc_medio','cc_alto'))
 (table(data$CCSCORE_classe))
 ```
+
 **SOFAING_classe**
-Per il punteggio SOFAING sono state create due classi: basso e alto.
+
+Per il punteggio "SOFAING" sono state create due classi: basso e alto.
+
 ```{r}
 data$SOFAING_classe = ifelse(data$SOFAING== '0','sofa_basso', 'sofa_alto')
 table(data$SOFAING_classe)
 ```
-Creiamo la variabile BMI ed anche la classe
+
+Creiamo la variabile "BMI" ed anche la classe.
 
 **MMSE_classe**
-Dividamo il punteggio MMSE_classe
+
+Dividamo il punteggio "MMSE_classe".
+
 ```{r}
 data$MMSE_classe <- data$MMSE
 
@@ -550,7 +571,8 @@ data$BMI_classi = ifelse(data$BMI<18.5,'sottopeso',ifelse(data$BMI<25,'normopeso
 head(data$BMI)
 table(data$BMI_classi)
 ```
-Calcoliamo l'età dei pazient, assumento la data intervento come riferimento per il calcolo
+
+Calcoliamo l'età dei pazienti, assumendo la data di intervento come riferimento per il calcolo.
 
 **AGE e AGE_classe**
 
@@ -560,7 +582,9 @@ data$AGE <- as.numeric(difftime(data$DATINT, data$NASCITA, units = "weeks")) / 5
 data$AGE <- trunc(data$AGE)
 cat("data$AGE =", data$AGE, "\n")
 ```
-Dividamo in classi anche questa variabile
+
+Dividamo in classi anche questa variabile.
+
 ```{r}
 # create breakpoints for age classes
 breakpoints <- c(69, 75, 80, 85, 90, 95, 105)
@@ -576,6 +600,7 @@ data$AGE_classi
 **GGOSSERV e ANNIOSSERV**
 
 Infine andiamo a calcolare i giorni che il paziente rimane in osservazione dalla durata dell'intervento ad una data decisa a priori, che assumiamo sia sotto osservazione della clinica, questa variabile ci servirà per la curva di sopravvivenza.
+
 ```{r}
 
 data$fine_data = ifelse(is.na(data$`DATA DECESSO`),NA,data$`DATA DECESSO`)
@@ -590,13 +615,14 @@ data$fine_data =as.Date(data$fine_data,origin = "1970-01-01", )
 data$GGOSSERV = as.numeric(difftime(data$fine_data, data$DATINT, units = "days"))
 data$GGOSSERV
 ```
-Osservo due valori negativi, quindi questo significa che ci sono due date incongruenti tra data decesso ed intervento, la data di decesso è un dato molto importante e significativo, decidiamo quindi di eliminare tutti i dati riguardanti questi pazienti per non influire sulle nostre analisi.
+
+Osserviamo due valori negativi, quindi questo significa che ci sono due date incongruenti tra data decesso ed intervento, la data di decesso è un dato molto importante e significativo, decidiamo quindi di eliminare tutti i dati riguardanti questi pazienti per non influire sulle nostre analisi.
 
 ```{r}
 data <- subset(data, GGOSSERV>=0)
 ```
 
-Creiamo anche la variabile ANNIOSSERV
+Creiamo la variabile "ANNIOSSERV".
 ```{r}
 data$ANNIOSSERV<- data$GGOSSERV/365
 data$ANNIOSSERV <- trunc(data$ANNIOSSERV)
@@ -604,10 +630,12 @@ cat("data$ANNIOSSERV =", data$ANNIOSSERV, "\n")
 ```
 
 #Exploratory data analysis
-bla bla
+
+Principalmente l'Exploratory Data Analysis (EDA) serve a vedere cosa possono dirci i dati al di là della modellazione formale e quindi si contrappone ai tradizionali test di ipotesi.
 
 **Missing values**
-Per prima cosa analizziamo i missing value
+
+Per prima cosa analizziamo la presenza di valori mancanti.
 
 ```{r}
 library(ggplot2)
@@ -645,14 +673,16 @@ ggplot(null_data, aes(x = reorder(col, -count), y = count, fill = "lightpink")) 
 
 ```
 
-Questa osservazione la si può fare per individuare quali variabili, in fase di analisi, potranno portare a
-distorsioni nei risultati per dati mancanti. Ovviamente la data decesso è quella che contiene maggiori NA
-in quanto non tutti i pazienti sono deceduti. Infatti questa tecnica è più utile in variabili conteggio dove è
-necessario andare ad indagare più approfonditamente i risultati.
+Questa osservazione la si può fare per individuare quelle variabili che, in fase di analisi, potranno portare a
+distorsioni nei risultati per i dati mancanti. Ovviamente la data di decesso è quella che contiene maggiori NA
+in quanto non tutti i pazienti sono deceduti. 
+Infatti questa tecnica è più utile in variabili conteggio dove è necessario andare ad indagare più approfonditamente i risultati.
 
 **Distribuzione di genere**
+
 Andiamo ad analizzare le distribuzioni di genere in base alle variabili più importanti.
-Prima di osserviamo il numero di donne e uomini presenti nel dataset
+Osserviamo il numero di donne e uomini presenti nel dataset
+
 ```{r}
 # Calcola il numero di donne e uomini
 sex_counts <- table(data$SEX)
@@ -884,7 +914,7 @@ table1(~ SEX + AGE + AGE_classi + BMI + BMI_classi + MMSE_classe +SOFAING_classe
 
 **CCSCORE e SOFA**
 
-Andiamo ad analizzare nello specifico i due punteggi CCSCORE e SOFA
+Andiamo ad analizzare nello specifico i due punteggi "CCSCORE" e "SOFA"
 ```{r}
 table1(~ CCSCORE_classe | SOFAING_classe*SEX, data=data,overall=F, extra.col=list('P-value'=pvalue))
 ```
