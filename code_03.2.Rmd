@@ -634,7 +634,11 @@ cat("data$ANNIOSSERV =", data$ANNIOSSERV, "\n")
 
 #Exploratory data analysis
 
-Principalmente l'Exploratory Data Analysis (EDA) serve a vedere cosa possono dirci i dati al di là della modellazione formale e quindi si contrappone ai tradizionali test di ipotesi.
+L'EDA è una metodologia analitica che prevede l'esplorazione dei dati in modo visivo e statistico, al fine di comprendere le caratteristiche del dataset e le relazioni tra le variabili. In questo contesto, il dataset contenente informazioni mediche e SOFA e CCScore è di particolare interesse perché può fornire informazioni importanti sulle condizioni di salute dei pazienti.
+
+Il SOFA (Sequential Organ Failure Assessment) è un punteggio utilizzato per quantificare la gravità dell'insufficienza organica in pazienti critici, mentre il CCScore (Charlson Comorbidity Index Score) è un punteggio utilizzato per quantificare la gravità delle comorbidità dei pazienti. Entrambi i punteggi sono ampiamente utilizzati in campo medico e possono fornire una valutazione rapida e affidabile della gravità della malattia.
+
+L'EDA può essere applicata a questo dataset per identificare eventuali relazioni tra le variabili, ad esempio per verificare se esiste una correlazione tra il punteggio SOFA e il CCScore, o se esiste una relazione tra le caratteristiche demografiche dei pazienti e i loro punteggi di gravità.
 
 **Missing values**
 
