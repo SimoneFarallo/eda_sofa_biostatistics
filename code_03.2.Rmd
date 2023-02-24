@@ -971,7 +971,7 @@ cl.cex = 0.5, cl.pos = "n")
 
 
 # Analisi di sopravvivenza
-
+L'analisi di sopravvivenza è una metodologia statistica che si occupa di analizzare il tempo che trascorre tra un evento iniziale e un evento di interesse, come ad esempio la morte di un paziente o il guasto di un componente elettronico.
 Come prima cosa creiamo una variabile 0 e 1 per i decessi, 1=decessi 0=vivi
 ```{r}
 data$EVENTO<-ifelse(is.na(data$`DATA DECESSO`), 0,1 )
@@ -1017,8 +1017,14 @@ summary(cox_SOFA)
 ```
 Rispetto agli altri score
 ```{r}
-cox_GEN <- coxph(Surv(ANNIOSSERV,all)~SOFAING_classe+AGE_classi+BMI_classi+CCSCORE_classe+MMSE_classe,data = data_1)
+cox_GEN <- coxph(Surv(ANNIOSSERV,all)~SOFAING_classe+AGE_classi+BMI_classi+CCSCORE_classe+MMSE_classe+SEX,data = data_1)
 summary(cox_GEN)
 ```
+
+# Conclusions
+
+
+
+
 
 
