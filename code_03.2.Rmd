@@ -971,6 +971,7 @@ cl.cex = 0.5, cl.pos = "n")
 
 
 # Analisi di sopravvivenza
+<<<<<<< HEAD
 
 Per finire, un ulteriore analisi che si può effettuare con i dati a nostra disposizione è l'analisi di sopravvivenza.
 Come prima cosa creiamo una variabile 'EVENTO'che ha i seguenti valori:
@@ -978,6 +979,10 @@ Come prima cosa creiamo una variabile 'EVENTO'che ha i seguenti valori:
 0 = paziente vivo
 Ciò che si vuole dimostrare è che a un elevato punteggio SOFA corrisponde un aumento del rischio di mortalità, la prima verifica viene fatta tramite la curva Kaplan-Meier.
 
+=======
+L'analisi di sopravvivenza è una metodologia statistica che si occupa di analizzare il tempo che trascorre tra un evento iniziale e un evento di interesse, come ad esempio la morte di un paziente o il guasto di un componente elettronico.
+Come prima cosa creiamo una variabile 0 e 1 per i decessi, 1=decessi 0=vivi
+>>>>>>> 63ef6fbf1128beff754fe84254bb120becbc5caa
 ```{r}
 data$EVENTO<-ifelse(is.na(data$`DATA DECESSO`), 0,1 )
 data$EVENTO
@@ -1037,10 +1042,20 @@ con un intervallo di confidenza (0.029,0.405).
 Considerando invece le altre covariate il modello diventa il seguente:
 
 ```{r}
-cox_GEN <- coxph(Surv(ANNIOSSERV,all)~SOFAING_classe+AGE_classi+BMI_classi+CCSCORE_classe+MMSE_classe,data = data_1)
+cox_GEN <- coxph(Surv(ANNIOSSERV,all)~SOFAING_classe+AGE_classi+BMI_classi+CCSCORE_classe+MMSE_classe+SEX,data = data_1)
 summary(cox_GEN)
 ```
 
+<<<<<<< HEAD
 La variabile sofa basso è ancora significativa. Il coefficiente passa da -2.2137 a -2.054 e l’HR da 0.109 a 0.128
 con un IC (0.029,0.567). Si verifica perciò sempre l’effetto protettivo del sofa basso rispetto al sofa alto sulla
 mortalità come evidenziato anche dalla curva KM.
+=======
+# Conclusions
+
+
+
+
+
+
+>>>>>>> 63ef6fbf1128beff754fe84254bb120becbc5caa
