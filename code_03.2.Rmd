@@ -642,12 +642,11 @@ data$ANNIOSSERV <- trunc(data$ANNIOSSERV)
 cat("data$ANNIOSSERV =", data$ANNIOSSERV, "\n")
 ```
 
-#Exploratory data analysis
+# Exploratory data analysis
 
-L'EDA è una metodologia analitica che prevede l'esplorazione dei dati in modo visivo e statistico, al fine di comprendere le caratteristiche del dataset e le relazioni tra le variabili.
-In questo contesto, il dataset contenente informazioni mediche e SOFA e CCScore è di particolare interesse perché può fornire informazioni importanti sulle condizioni di salute dei pazienti.
+L'EDA è una metodologia analitica che prevede l'esplorazione dei dati in modo visivo e statistico, al fine di comprendere le caratteristiche del dataset e le relazioni tra le variabili; può essere applicata a questo dataset per identificare eventuali relazioni tra le variabili, ad esempio per verificare se esiste una correlazione tra il punteggio SOFA e il CCScore, o se esiste una relazione tra le caratteristiche dei pazienti e i loro punteggi di gravità.
 
-Il SOFA (Sequential Organ Failure Assessment) è un punteggio utilizzato per quantificare la gravità dell'insufficienza organica in pazienti critici, mentre il CCScore (Charlson Comorbidity Index Score) è un punteggio utilizzato per quantificare la gravità delle comorbidità dei pazienti.
+In questo contesto, il dataset contenente informazioni mediche e SOFA e CCScore è di particolare interesse perché può fornire informazioni importanti sulle condizioni di salute dei pazienti Il SOFA (Sequential Organ Failure Assessment) è un punteggio utilizzato per quantificare la gravità dell'insufficienza organica in pazienti critici, mentre il CCScore (Charlson Comorbidity Index Score) è un punteggio utilizzato per quantificare la gravità delle comorbidità dei pazienti.
 Entrambi i punteggi sono ampiamente utilizzati in campo medico e possono fornire una valutazione rapida e affidabile della gravità della malattia.
 
 L'EDA può essere applicata a questo dataset per identificare eventuali relazioni tra le variabili, ad esempio per verificare se esiste una correlazione tra il punteggio SOFA e il CCScore, o se esiste una relazione tra le caratteristiche demografiche dei pazienti e i loro punteggi di gravità.
@@ -692,18 +691,21 @@ ggplot(null_data, aes(x = reorder(col, -count), y = count, fill = "lightpink")) 
 
 ```
 
-Osservare i valori nulli nei dati è importante perché questi possono avere un impatto significativo sull'analisi e sull'interpretazione dei risultati. In particolare, i valori nulli possono causare problemi come la perdita di informazioni, l'insorgere di errori nelle analisi statistiche e la creazione di bias nei modelli.
+Osservare i valori nulli nei dati è importante perché questi possono avere un impatto significativo sull'analisi e sull'interpretazione dei risultati.
+In particolare, i valori nulli possono causare problemi come la perdita di informazioni, l'insorgere di errori nelle analisi statistiche e la creazione di bias nei modelli.
 
-Nel caso della una variabile "data decesso" che contiene valori nulli all'80%, questo può indicare che la maggior parte dei pazienti è in vita oppure che le informazioni sul decesso non sono state registrate o non sono disponibili. In questo caso, sarà necessario valutare attentamente come gestire questi dati mancanti.
+Nel caso della una variabile "data decesso" che contiene valori nulli all'80%, questo può indicare che la maggior parte dei pazienti è in vita oppure che le informazioni sul decesso non sono state registrate o non sono disponibili.
+In questo caso, sarà necessario valutare attentamente come gestire questi dati mancanti.
 
-La variabile VITD con valori nulli al 25%  potrebbe comunque essere utilizzata nell'analisi, a patto che il numero di valori mancanti non influisca in modo significativo sulla potenza dell'analisi o sulla rappresentatività del campione, anche la variabile DATDIM che indica la data di dimissione contiente un numero significativo di valori nulli;
-mentre la variabile MMSE_classe contiene valori nulli perchè la colonna MMSE contiene diversi 0, non sappiamo se è un punteggio possibile o un errore, di conseguenza decidiamo di non fare ulteriore modiche e tenere entrambe le colonne, in caso di distorsioni con i valori 0 provvederemo a fare eventuali modifiche.
+La variabile VITD con valori nulli al 25% potrebbe comunque essere utilizzata nell'analisi, a patto che il numero di valori mancanti non influisca in modo significativo sulla potenza dell'analisi o sulla rappresentatività del campione, anche la variabile DATDIM che indica la data di dimissione contiente un numero significativo di valori nulli; mentre la variabile MMSE_classe contiene valori nulli perchè la colonna MMSE contiene diversi 0, non sappiamo se è un punteggio possibile o un errore, di conseguenza decidiamo di non fare ulteriore modiche e tenere entrambe le colonne, in caso di distorsioni con i valori 0 provvederemo a fare eventuali modifiche.
 
-Infine, la presenza di pochi valori nulli (sotto il 5%) può essere considerata un valore accettabile e non influente sull'analisi. Tuttavia, anche in questi casi, è importante verificare la ragione per cui questi valori sono mancanti.
+Infine, la presenza di pochi valori nulli (sotto il 5%) può essere considerata un valore accettabile e non influente sull'analisi.
+Tuttavia, anche in questi casi, è importante verificare la ragione per cui questi valori sono mancanti.
 
 **Analisi delle principali variabili rispetto alle classi di età**
 
-Un'analisi delle principali variabili rispetto alle classi di età può aiutare a comprendere le differenze tra le varie fasce d'età in termini di variabili di interesse. Ciò può fornire informazioni preziose per la gestione delle malattie e per lo sviluppo di interventi di prevenzione e trattamento specifici per le diverse fasce d'età.
+Un'analisi delle principali variabili rispetto alle classi di età può aiutare a comprendere le differenze tra le varie fasce d'età in termini di variabili di interesse.
+Ciò può fornire informazioni preziose per la gestione delle malattie e per lo sviluppo di interventi di prevenzione e trattamento specifici per le diverse fasce d'età.
 
 Andremo ad esaminare come variano BMI, SOFA score, CC score, MMSE score e altre variabili di interesse in base all'età dei pazienti
 
@@ -718,6 +720,7 @@ barplot(age_count,
         ylab = "Numero di individui", 
         col = c( "lightblue"))
 ```
+
 La maggior parte dei pazienti è compresa nell'intervallo di età da 80 a 90 anni, in generale il campione del dataset è molto anziano.
 
 ```{r}
@@ -729,10 +732,11 @@ ggplot(data, aes(x = BMI_classi, fill = AGE_classi)) +
   scale_fill_brewer(palette = "Set2") +
   scale_y_continuous(breaks = seq(0, 15, 2))
 ```
-La maggior parte dei pazienti è normopeso, soprattutto nelle fasce d'età da 75 a 90 anni, suggerisce che il peso corporeo dei pazienti in queste fasce d'età sia generalmente adeguato rispetto all'età e alla statura,tuttavia, è importante notare che il peso corporeo può essere influenzato da  fattori come l'attività fisica, la dieta, le condizioni di salute e i farmaci.
 
-Inoltre, il fatto che circa 15 pazienti su 60 siano in sovrappeso,7 pazienti nella fascia d'età 80-85, suggerisce che l'aumento di peso può essere un problema significativo per alcune persone anziane. L'eccesso di peso può aumentare il rischio di malattie come l'ipertensione, il diabete e le malattie cardiovascolari, tra le altre.
+La maggior parte dei pazienti è normopeso, soprattutto nelle fasce d'età da 75 a 90 anni, suggerisce che il peso corporeo dei pazienti in queste fasce d'età sia generalmente adeguato rispetto all'età e alla statura,tuttavia, è importante notare che il peso corporeo può essere influenzato da fattori come l'attività fisica, la dieta, le condizioni di salute e i farmaci.
 
+Inoltre, il fatto che circa 15 pazienti su 60 siano in sovrappeso,7 pazienti nella fascia d'età 80-85, suggerisce che l'aumento di peso può essere un problema significativo per alcune persone anziane.
+L'eccesso di peso può aumentare il rischio di malattie come l'ipertensione, il diabete e le malattie cardiovascolari, tra le altre.
 
 ```{r}
 ggplot(data, aes(x = CCSCORE_classe, fill = AGE_classi)) +
@@ -744,8 +748,9 @@ ggplot(data, aes(x = CCSCORE_classe, fill = AGE_classi)) +
   scale_y_continuous(breaks = seq(0, 15, 2))
 ```
 
-
-circa la metà dei pazienti ha un ccscore basso suggerisce che molti pazienti non presentano molte comorbidità. Al contrario, il fatto che circa 20 pazienti abbiano un ccscore medio suggerisce che un certo numero di pazienti potrebbe avere comorbilità moderate o un'età più avanzata. Inoltre, l'assenza di pazienti con ccscore alto nella fascia d'età 75-80 suggerisce che i pazienti in questa fascia d'età potrebbero avere una buona salute generale.
+circa la metà dei pazienti ha un ccscore basso suggerisce che molti pazienti non presentano molte comorbidità.
+Al contrario, il fatto che circa 20 pazienti abbiano un ccscore medio suggerisce che un certo numero di pazienti potrebbe avere comorbilità moderate o un'età più avanzata.
+Inoltre, l'assenza di pazienti con ccscore alto nella fascia d'età 75-80 suggerisce che i pazienti in questa fascia d'età potrebbero avere una buona salute generale.
 
 Inoltre, l'informazione che la classe di età 95 è presente solo nel cc basso e medio potrebbe,tuttavia, va considerato che questa informazione potrebbe essere influenzata dal fatto che il campione di pazienti anziani sia relativamente piccolo e non rappresentativo .
 
@@ -761,10 +766,11 @@ ggplot(data, aes(x = SOFAING_classe, fill = AGE_classi)) +
   scale_y_continuous(breaks = seq(0, 15, 2))
   
 ```
-a maggior parte dei pazienti ha un CCscore basso suggerisce che molti pazienti potrebbero non avere comorbilità significative. Questo potrebbe essere un fattore positivo per la loro salute e il loro benessere generale.
 
-Inoltre, il fatto che ci siano solo due pazienti con uno score alto nella fascia d'età 70-80 suggerisce che i pazienti in questa fascia d'età potrebbero essere relativamente sani. 
+a maggior parte dei pazienti ha un CCscore basso suggerisce che molti pazienti potrebbero non avere comorbilità significative.
+Questo potrebbe essere un fattore positivo per la loro salute e il loro benessere generale.
 
+Inoltre, il fatto che ci siano solo due pazienti con uno score alto nella fascia d'età 70-80 suggerisce che i pazienti in questa fascia d'età potrebbero essere relativamente sani.
 
 ```{r}
 ggplot(data, aes(x = MMSE_classe, fill = AGE_classi)) +
@@ -776,10 +782,10 @@ ggplot(data, aes(x = MMSE_classe, fill = AGE_classi)) +
 scale_y_continuous(breaks = seq(0, 15, 2))
 ```
 
-L'omogeneità della distribuzione delle classi di età rispetto ai livelli di MMSE suggerisce che l'età potrebbe non essere un fattore determinante nella capacità cognitiva dei pazienti. Tuttavia, il fatto che la maggior parte dei pazienti nella fascia d'età 70-80 abbia valori MMSE più normali e lievi rispetto alle altre classi potrebbe indicare una maggiore prevalenza di problemi cognitivi in età più avanzata.
+L'omogeneità della distribuzione delle classi di età rispetto ai livelli di MMSE suggerisce che l'età potrebbe non essere un fattore determinante nella capacità cognitiva dei pazienti.
+Tuttavia, il fatto che la maggior parte dei pazienti nella fascia d'età 70-80 abbia valori MMSE più normali e lievi rispetto alle altre classi potrebbe indicare una maggiore prevalenza di problemi cognitivi in età più avanzata.
 
 È importante considerare che l'MMSE è uno strumento di valutazione cognitiva generale e che potrebbero esserci altri fattori che influenzano la salute cognitiva dei pazienti.
-
 
 **Analisi delle principali variabili rispetto al sesso**
 
@@ -797,6 +803,7 @@ barplot(sex_counts,
         ylab = "Numero di individui", 
         col = c("lightpink", "steelblue"))
 ```
+
 Notiamo come la maggior parte dei pazienti sono donne, questa variabile risulta molto sbilanciata quindi successivamente sarà meglio svolgere analisi di genere per non creare distorsioni fra i dati.
 
 Osserviamo la distribuzioni di genere rispetto alle classi di età.
@@ -811,10 +818,10 @@ ggplot(data, aes(x = AGE_classi, fill = SEX)) +
   scale_fill_brewer(palette = "Set2")+
   scale_y_continuous(breaks = seq(0, 20, 2))
 ```
+
 I pazienti sono molto anziani e la maggior parte hanno età compresa fra 80 e 90 anni.
 
-
-Studiare la distribuzione del BMI nelle diverse classi di età può aiutare a comprendere come il peso corporeo  se ci sono differenze tra uomini e donne in questo processo, inoltre possiamo comprendere se anche questa variabile può influire sugli score
+Studiare la distribuzione del BMI nelle diverse classi di età può aiutare a comprendere come il peso corporeo se ci sono differenze tra uomini e donne in questo processo, inoltre possiamo comprendere se anche questa variabile può influire sugli score
 
 ```{r}
 ggplot(data, aes(x = BMI_classi, fill = SEX)) +
@@ -826,8 +833,8 @@ ggplot(data, aes(x = BMI_classi, fill = SEX)) +
   scale_fill_brewer(palette = "Set2")+
 scale_y_continuous(breaks = seq(0, 30, 4))
 ```
-La maggior parte dei pazienti hanno un peso corporeo adeguato alla loro età, notiamo  15  pazienti donna in sovrappeso.
 
+La maggior parte dei pazienti hanno un peso corporeo adeguato alla loro età, notiamo 15 pazienti donna in sovrappeso.
 
 ```{r}
 ggplot(data, aes(x = CCSCORE_classe, fill = SEX)) +
@@ -839,14 +846,15 @@ ggplot(data, aes(x = CCSCORE_classe, fill = SEX)) +
   scale_fill_brewer(palette = "Set2")+
 scale_y_continuous(breaks = seq(0, 25, 2))
 ```
-La maggior parte dei pazienti donna presentano un  CCscore basso questo indica che l'individuo ha una minor presenza di malattie croniche. Questo può essere un indicatore di una migliore salute generale dell'individuo e di un minor rischio di complicanze mediche associate a malattie croniche, tuttavia, non significa necessariamente che l'individuo sia completamente privo di malattie o di altre condizioni mediche.
+
+La maggior parte dei pazienti donna presentano un CCscore basso questo indica che l'individuo ha una minor presenza di malattie croniche.
+Questo può essere un indicatore di una migliore salute generale dell'individuo e di un minor rischio di complicanze mediche associate a malattie croniche, tuttavia, non significa necessariamente che l'individuo sia completamente privo di malattie o di altre condizioni mediche.
 17 presentano un CC score medio e 9 un CC score alto, ciò potrebbe indicare che la popolazione in questione ha una prevalenza relativamente elevata di malattie croniche, ma non estremamente elevata.
 
-Il fatto che circa il 40% della popolazione presenti un CC score medio suggerisce che molte persone hanno almeno una malattia cronica, anche se non in forma grave. D'altra parte, il fatto che solo il 20% della popolazione presenti un CC score alto suggerisce che un numero relativamente ridotto di persone ha molte malattie croniche, ma che queste sono di una certa gravità.
+Il fatto che circa il 40% della popolazione presenti un CC score medio suggerisce che molte persone hanno almeno una malattia cronica, anche se non in forma grave.
+D'altra parte, il fatto che solo il 20% della popolazione presenti un CC score alto suggerisce che un numero relativamente ridotto di persone ha molte malattie croniche, ma che queste sono di una certa gravità.
 
 Per gli uomini le classi sono più omogenee e non ci sono grandi differenze.
-
-
 
 ```{r}
 ggplot(data, aes(x = SOFAING_classe, fill = SEX)) +
@@ -858,9 +866,12 @@ ggplot(data, aes(x = SOFAING_classe, fill = SEX)) +
   scale_fill_brewer(palette = "Set2")+
   scale_y_continuous(breaks = seq(0, 40, 5))
 ```
-Un SOFA score basso indica che la funzionalità degli organi è relativamente stabile e non ci sono segni di insufficienza grave. Tuttavia, bisogna anche considerare il fatto che il SOFA score non fornisce una valutazione completa dello stato di salute del paziente e non tiene conto di altri fattori importanti come la storia medica, la terapia attuale e il decorso della malattia.
 
-La maggior parte dei pazienti donna ha un SOFA score basso, ciò potrebbe suggerire che queste donne sono in una condizione relativamente stabile e non presentano una grave insufficienza d'organo. Tuttavia, anche in questo caso, è importante considerare ulteriori fattori come la presenza di altre malattie croniche o l'età delle pazienti per ottenere una valutazione più completa della loro situazione sanitaria.
+Un SOFA score basso indica che la funzionalità degli organi è relativamente stabile e non ci sono segni di insufficienza grave.
+Tuttavia, bisogna anche considerare il fatto che il SOFA score non fornisce una valutazione completa dello stato di salute del paziente e non tiene conto di altri fattori importanti come la storia medica, la terapia attuale e il decorso della malattia.
+
+La maggior parte dei pazienti donna ha un SOFA score basso, ciò potrebbe suggerire che queste donne sono in una condizione relativamente stabile e non presentano una grave insufficienza d'organo.
+Tuttavia, anche in questo caso, è importante considerare ulteriori fattori come la presenza di altre malattie croniche o l'età delle pazienti per ottenere una valutazione più completa della loro situazione sanitaria.
 
 ```{r}
 ggplot(data, aes(x = MMSE_classe, fill = SEX)) +
@@ -871,13 +882,15 @@ ggplot(data, aes(x = MMSE_classe, fill = SEX)) +
   ylab("Conteggio") +
   scale_fill_brewer(palette = "Set2")
 ```
-La maggior parte dei pazienti ha un punteggio MMSE normale lieve, ciò suggerisce che la loro funzione cognitiva è generalmente buona e che non vi sono gravi problemi di memoria, attenzione e ragionamento. 
-Circa 15 pazienti su un totale di 60 hanno un punteggio MMSE moderato-grave, ciò suggerisce che questi pazienti potrebbero avere problemi significativi di memoria, attenzione e ragionamento. Questo punteggio potrebbe indicare la presenza di una malattia neurologica come la demenza o l'Alzheimer, ma anche altre condizioni mediche e psicologiche possono influenzare il punteggio MMSE; in ogni caso, questi pazienti richiedono una valutazione e un trattamento appropriati per gestire le loro condizioni mediche.
 
+La maggior parte dei pazienti ha un punteggio MMSE normale lieve, ciò suggerisce che la loro funzione cognitiva è generalmente buona e che non vi sono gravi problemi di memoria, attenzione e ragionamento.
+Circa 15 pazienti su un totale di 60 hanno un punteggio MMSE moderato-grave, ciò suggerisce che questi pazienti potrebbero avere problemi significativi di memoria, attenzione e ragionamento.
+Questo punteggio potrebbe indicare la presenza di una malattia neurologica come la demenza o l'Alzheimer, ma anche altre condizioni mediche e psicologiche possono influenzare il punteggio MMSE; in ogni caso, questi pazienti richiedono una valutazione e un trattamento appropriati per gestire le loro condizioni mediche.
 
 **Funzione cumulata per SOFA e CCSCORE**
 
-Una funzione cumulata dell'età rispetto allo score SOFA può fornire informazioni sul modo in cui la salute dei pazienti cambia con l'età. La funzione cumulata rappresenta la distribuzione cumulata delle osservazioni rispetto alla variabile di età e al punteggio SOFA.
+Una funzione cumulata dell'età rispetto allo score SOFA può fornire informazioni sul modo in cui la salute dei pazienti cambia con l'età.
+La funzione cumulata rappresenta la distribuzione cumulata delle osservazioni rispetto alla variabile di età e al punteggio SOFA.
 
 ```{r}
 #funzione empirica cumulata dell'età divisa per sesso
@@ -900,7 +913,7 @@ x = "Punteggio Sofa", y = "Frequenza cumulata età")
 bxp
 ```
 
-Il fatto che la funzione cumulata rappresentante le donne sia sopra quella degli uomini per i punteggi SOFA da 0 a 2 potrebbe indicare che le donne in generale presentano meno comorbilità rispetto agli uomini nella stessa fascia di età. 
+Il fatto che la funzione cumulata rappresentante le donne sia sopra quella degli uomini per i punteggi SOFA da 0 a 2 potrebbe indicare che le donne in generale presentano meno comorbilità rispetto agli uomini nella stessa fascia di età.
 Tuttavia, il fatto che le funzioni si allineino per i punteggi SOFA da 2 a 4 potrebbe indicare che la relazione tra età e SOFA score è simile per uomini e donne.l'analisi delle funzioni cumulate potrebbe suggerire la presenza di differenze di genere nella distribuzione dei punteggi SOFA in relazione all'età, ma è importante considerare ulteriori informazioni e condizioni specifiche del dataset per una corretta interpretazione.
 
 ```{r}
@@ -927,7 +940,8 @@ bxp
 
 Quando le funzioni cumulate per uomini e donne si incrociano frequentemente e sembrano confuse, ciò potrebbe indicare che non vi è una forte associazione tra l'età e il CCscore e/o che non vi sono differenze significative tra uomini e donne.
 
-Tuttavia, è importante considerare l'intervallo di età e il campione di pazienti inclusi nello studio. Ad esempio, se l'intervallo di età è ampio e il campione di pazienti è relativamente piccolo, le differenze tra gli uomini e le donne potrebbero non essere sufficientemente rappresentative.
+Tuttavia, è importante considerare l'intervallo di età e il campione di pazienti inclusi nello studio.
+Ad esempio, se l'intervallo di età è ampio e il campione di pazienti è relativamente piccolo, le differenze tra gli uomini e le donne potrebbero non essere sufficientemente rappresentative.
 
 **Classificazione variabili principali rispetto a SOFA e CCSCORE**
 
@@ -950,12 +964,13 @@ pvalue <- function(x, ...) {
 
 table1(~ SEX + AGE  + AGE_classi + BMI + BMI_classi  + MMSE_classe + CCSCORE_classe  | SOFAING_classe, data=data, overall=F, extra.col=list('P-value'=pvalue))
 ```
-In questa tabella viene presentata una descrizione delle variabili principali classificate in base al punteggio Sofa, dove per le variabili categoriche viene confrontata la numerosità entro gruppi e le percentuali, mentre per quelle numeriche vengono osservate la media con la deviazione standard e la mediana con il range di appartenenza. 
 
-Si può notare come ci sia una maggior presenza di pazienti con Sofa basso nella coorte di pazienti, che è prevalentemente di genere femminile con un'età molto alta, superiore agli 80 anni in entrambe le categorie di Sofa e con un BMI normale. 
+In questa tabella viene presentata una descrizione delle variabili principali classificate in base al punteggio Sofa, dove per le variabili categoriche viene confrontata la numerosità entro gruppi e le percentuali, mentre per quelle numeriche vengono osservate la media con la deviazione standard e la mediana con il range di appartenenza.
+
+Si può notare come ci sia una maggior presenza di pazienti con Sofa basso nella coorte di pazienti, che è prevalentemente di genere femminile con un'età molto alta, superiore agli 80 anni in entrambe le categorie di Sofa e con un BMI normale.
 Inoltre, osservando la variabile ccscore, si nota come nella categoria Sofa alto si definiscono pazienti con un punteggio di comorbilità medio/alto, mentre nella categoria Sofa basso il 58% dei pazienti ha un ccscore basso.
-Il p-value rappresenta la probabilità che l'effetto osservato o la differenza tra i gruppi o la relazione tra le variabili non siano dovuti al caso, ma siano effettivamente presenti nella popolazione di riferimento, è importante  notare che in questo caso le variabili risultano non significativi al 5% , tranne che per la classe ccscore, quindi possiamo affermare che esiste una relazione significativa tra il punteggio CCscore e il punteggio SOFA. Tuttavia, bisogna ricordare che la significatività statistica non implica necessariamente una forte associazione tra le variabili o una relazione di causa-effetto.
-
+Il p-value rappresenta la probabilità che l'effetto osservato o la differenza tra i gruppi o la relazione tra le variabili non siano dovuti al caso, ma siano effettivamente presenti nella popolazione di riferimento, è importante notare che in questo caso le variabili risultano non significativi al 5% , tranne che per la classe ccscore, quindi possiamo affermare che esiste una relazione significativa tra il punteggio CCscore e il punteggio SOFA.
+Tuttavia, bisogna ricordare che la significatività statistica non implica necessariamente una forte associazione tra le variabili o una relazione di causa-effetto.
 
 ```{r}
 pvalue <- function(x, ...) {
@@ -996,19 +1011,21 @@ table1(~ SEX + AGE + AGE_classi + BMI + BMI_classi + MMSE_classe +SOFAING_classe
 
 ```
 
-La tabella riporta le frequenze e le percentuali di alcune variabili in relazione alla classificazione dei pazienti in tre gruppi (cc_alto, cc_basso, cc_medio) e all'interno di ogni gruppo, sono riportati i valori delle variabili categoriche (sesso, età, BMI, MMSE_classe, SOFAING_classe). La tabella riporta anche il valore di p per il test di significatività per ogni variabile in ogni gruppo.
-Per quanto riguarda il sesso, la maggioranza dei pazienti in tutti e tre i gruppi sono donne, ma non c'è una differenza significativa tra i gruppi (p = 0,683). Inoltre, non ci sono differenze significative tra i gruppi per l'età e il BMI.
+La tabella riporta le frequenze e le percentuali di alcune variabili in relazione alla classificazione dei pazienti in tre gruppi (cc_alto, cc_basso, cc_medio) e all'interno di ogni gruppo, sono riportati i valori delle variabili categoriche (sesso, età, BMI, MMSE_classe, SOFAING_classe).
+La tabella riporta anche il valore di p per il test di significatività per ogni variabile in ogni gruppo.
+Per quanto riguarda il sesso, la maggioranza dei pazienti in tutti e tre i gruppi sono donne, ma non c'è una differenza significativa tra i gruppi (p = 0,683).
+Inoltre, non ci sono differenze significative tra i gruppi per l'età e il BMI.
 
 Tuttavia, c'è una differenza significativa nella distribuzione dei punteggi del MMSE tra i gruppi (p = 0,0163), con la maggior parte dei pazienti del gruppo "sofaing_classe" con disfunzione degli organi moderata che hanno un deficit cognitivo grave (22,7%).
 
 Infine, la distribuzione dei pazienti in base all'età e al BMI, suddivisi in classi, non mostra differenze significative tra i gruppi.
 
-**CCSCORE e SOFA**
-Questa tabella riporta la distribuzione del punteggio SOFA (Sequential Organ Failure Assessment) diviso in due gruppi (sofa_alto e sofa_basso) in base al valore di cutoff utilizzato per definire il gruppo, e in base al sesso (donna e uomo).
+**CCSCORE e SOFA** Questa tabella riporta la distribuzione del punteggio SOFA (Sequential Organ Failure Assessment) diviso in due gruppi (sofa_alto e sofa_basso) in base al valore di cutoff utilizzato per definire il gruppo, e in base al sesso (donna e uomo).
 
 ```{r}
 table1(~ CCSCORE_classe | SOFAING_classe*SEX, data=data,overall=F, extra.col=list('P-value'=pvalue))
 ```
+
 Inoltre, viene riportata la distribuzione della classe di gravità del punteggio clinico (CCSCORE) divisa in tre categorie (cc_alto, cc_basso e cc_medio) in base al valore di cutoff utilizzato per definire la classe, e in base al sesso.
 
 La tabella mostra che, tra le donne, il gruppo sofa_alto è presente in maggioranza tra coloro che appartengono alla classe di gravità cc_medio (50.0%), mentre tra gli uomini, il gruppo sofa_basso è più rappresentato tra coloro che appartengono alla classe di gravità cc_basso (60.0%).
@@ -1036,13 +1053,18 @@ ggplot(data, aes(x = SOFAING_classe, y = CCSCORE, fill = SOFAING_classe)) +
         legend.position = "none")
 
 ```
+
 Osservando il grafico, confermiamo quanto detto precedentemente.
 
 **Analisi correlazione**
 
-La matrice di correlazione può essere utilizzata per identificare le relazioni tra le variabili e per selezionare le variabili per ulteriori analisi. Ad esempio, le variabili con forti correlazioni possono essere utilizzate per creare modelli predittivi o per identificare potenziali variabili di confondimento in analisi statistiche.
-La tabella mostra la matrice di correlazione tra diverse variabili. Ogni cella mostra il coefficiente di correlazione tra due variabili. 
-Il coefficiente di correlazione varia da -1 a 1 e misura la forza e la direzione della relazione lineare tra le due variabili. Un coefficiente di 1 indica una perfetta correlazione positiva, mentre un coefficiente di -1 indica una perfetta correlazione negativa. Un coefficiente di 0 indica l'assenza di correlazione tra le due variabili.
+La matrice di correlazione può essere utilizzata per identificare le relazioni tra le variabili e per selezionare le variabili per ulteriori analisi.
+Ad esempio, le variabili con forti correlazioni possono essere utilizzate per creare modelli predittivi o per identificare potenziali variabili di confondimento in analisi statistiche.
+La tabella mostra la matrice di correlazione tra diverse variabili.
+Ogni cella mostra il coefficiente di correlazione tra due variabili.
+Il coefficiente di correlazione varia da -1 a 1 e misura la forza e la direzione della relazione lineare tra le due variabili.
+Un coefficiente di 1 indica una perfetta correlazione positiva, mentre un coefficiente di -1 indica una perfetta correlazione negativa.
+Un coefficiente di 0 indica l'assenza di correlazione tra le due variabili.
 
 ```{r}
 
@@ -1065,7 +1087,11 @@ diag = FALSE, tl.cex = 0.9, tl.srt = 90,
 cl.cex = 0.5, cl.pos = "n")
 ```
 
-Considerando solo le variabili più importanti per questa analisi, è possibile osservare sia correlazioni positive che negative. Tuttavia, il confronto più rilevante è quello tra il punteggio SOFAING e il CCSCORE. Sebbene il coefficiente di correlazione tra queste due variabili sia debolmente positivo (forse a causa della bassa numerosità del campione), è comunque significativo. Ciò significa che ad ogni aumento di una unità del CCSCORE, il SOFAING aumenta di circa il 26%. In altre parole, se un paziente ha più malattie contemporaneamente, il rischio di disfunzione degli organi aumenta del 26%.
+Considerando solo le variabili più importanti per questa analisi, è possibile osservare sia correlazioni positive che negative.
+Tuttavia, il confronto più rilevante è quello tra il punteggio SOFAING e il CCSCORE.
+Sebbene il coefficiente di correlazione tra queste due variabili sia debolmente positivo (forse a causa della bassa numerosità del campione), è comunque significativo.
+Ciò significa che ad ogni aumento di una unità del CCSCORE, il SOFAING aumenta di circa il 26%.
+In altre parole, se un paziente ha più malattie contemporaneamente, il rischio di disfunzione degli organi aumenta del 26%.
 
 # Analisi di sopravvivenza
 
@@ -1084,7 +1110,6 @@ data_1 <- mutate(data, all = EVENTO != "0")# La funzione mutate() del pacchetto 
 ```{r}
 View(data)
 ```
-
 
 **Modello di Kaplan-Meier**
 
