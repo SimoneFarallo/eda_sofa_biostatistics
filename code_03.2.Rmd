@@ -972,15 +972,22 @@ cl.cex = 0.5, cl.pos = "n")
 
 # Analisi di sopravvivenza
 
-Come prima cosa creiamo una variabile 0 e 1 per i decessi, 1=decessi 0=vivi
+Per finire, un ulteriore analisi che si può effettuare con i dati a nostra disposizione è l'analisi di sopravvivenza.
+Come prima cosa creiamo una variabile 'EVENTO'che ha i seguenti valori:
+1 = paziente deceduto
+0 = paziente vivo
+Ciò che si vuole dimostrare è che a un elevato punteggio SOFA corrisponde un aumento del rischio di mortalità, la prima verifica viene fatta tramite la curva Kaplan-Meier.
+
 ```{r}
 data$EVENTO<-ifelse(is.na(data$`DATA DECESSO`), 0,1 )
 data$EVENTO
 data_1 <- mutate(data, all = EVENTO != "0")# La funzione mutate() del pacchetto dplyr serve per creare o modificare colonne di un dataframe. In questo caso, la funzione mutate() viene utilizzata per creare una nuova colonna chiamata "all", che assume valore TRUE se l'evento ("EVENTO") del paziente non è "0" e FALSE altrimenti.
 ```
+
 **Modello di Kaplan-Meier**
 
 Costruiamo la curva di sopravvivenza
+
 ```{r}
 #Curva di sopravvivenza
 curva_soprav <- survfit(Surv(ANNIOSSERV, all) ~ SOFAING_classe, data = data_1)
@@ -1004,10 +1011,17 @@ ggsurvplot(curva_soprav, title='Curva di sopravvivenza di Kaplan-Meier',
            risk.table.height = 0.3, # Imposta l'altezza della tabella
            risk.table.width = 0.5) # Imposta la larghezza della tabella
 ```
-**Modello di Cox**
-Il modello di Cox è un modello di regressione utilizzato per analizzare la sopravvivenza in base a un insieme di covariate (o variabili esplicative). È un modello semiparametrico in quanto assume solo una distribuzione per il tempo di sopravvivenza, ma non fa alcuna ipotesi sulla forma funzionale della relazione tra covariate e hazard (il rischio di eventi).
 
-Rispetto allo score sofa
+Come si può facilmente osservare dal grafico è presente una riduzione della curva che fa riferimento a coloro che hanno un punteggio SOFA alto.
+Ad esempio si nota come il 50% dei pazienti che avevano un punteggio SOFA alto all'inizio sono deceduti entro un anno.
+Invece i pazienti con un punteggio relativamente basso si riducono del 10% circa.
+Bisogna tener conto che l'affidabilità dei risultati deve tenere in considerazione la bassa numerosità del campione di riferimento e del periodo temporale preso in considerazione, è deducibile però che in linea di massima il risultato con un maggior numero di osservazioni sarebbe simile.
+
+**Modello di Cox**
+
+Il modello di Cox è un modello di regressione utilizzato per analizzare la sopravvivenza in base a un insieme di covariate (o variabili esplicative). È un modello semiparametrico in quanto assume solo una distribuzione per il tempo di sopravvivenza, ma non fa alcuna ipotesi sulla forma funzionale della relazione tra covariate e hazard (il rischio di eventi).
+Dapprima utilizziamo il modello tenendo in considerazione la variabile di classificazione SOFA.
+
 ```{r}
 # Esegue il modello di Cox
 cox_SOFA <- coxph(Surv(ANNIOSSERV, all) ~ SOFAING_classe, data = data_1)
@@ -1016,9 +1030,17 @@ cox_SOFA <- coxph(Surv(ANNIOSSERV, all) ~ SOFAING_classe, data = data_1)
 summary(cox_SOFA)
 ```
 Rispetto agli altri score
+
+Da questo primo modello si osserva come la variabile sofa basso sia molto significativa e abbia un effetto
+protettivo sulla mortalità rispetto alla variabile di riferimento sofa alto. Si osserva infatti un HR dello 0.109
+con un intervallo di confidenza (0.029,0.405).
+Considerando invece le altre covariate il modello diventa il seguente:
+
 ```{r}
 cox_GEN <- coxph(Surv(ANNIOSSERV,all)~SOFAING_classe+AGE_classi+BMI_classi+CCSCORE_classe+MMSE_classe,data = data_1)
 summary(cox_GEN)
 ```
 
-
+La variabile sofa basso è ancora significativa. Il coefficiente passa da -2.2137 a -2.054 e l’HR da 0.109 a 0.128
+con un IC (0.029,0.567). Si verifica perciò sempre l’effetto protettivo del sofa basso rispetto al sofa alto sulla
+mortalità come evidenziato anche dalla curva KM.
