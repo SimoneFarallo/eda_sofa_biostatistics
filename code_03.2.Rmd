@@ -2,13 +2,13 @@
 title: "Biostatistica's Project"
 author: "Simone Farallo 889719 & Michele Salvaterra 891109"
 output:
-  pdf_document:
-    toc: yes
   html_document:
     toc: yes
     fig_caption: yes
     theme: flatly
     css: styles.css
+  pdf_document:
+    toc: yes
 editor_options: 
   markdown: 
     wrap: sentence
@@ -1096,7 +1096,7 @@ Sebbene il coefficiente di correlazione tra queste due variabili sia debolmente 
 Ciò significa che ad ogni aumento di una unità del "CC-score", il "SOFAING" aumenta di circa il 26%.
 In altre parole, se un paziente ha più malattie contemporaneamente, il rischio di disfunzione degli organi aumenta del 26%.
 
-# Analisi di sopravvivenza
+# Survival analysis
 
 Per finire, un'ulteriore analisi che si può effettuare con i dati a nostra disposizione è l'analisi di sopravvivenza.
 Come prima cosa creiamo una variabile 'EVENTO'che ha i seguenti valori: 
@@ -1176,7 +1176,7 @@ summary(cox_GEN)
 ```
 
 L'output mostra che diverse variabili predittive sono statisticamente significative nella previsione della variabile di outcome. 
-Ad esempio, SOFAING_classesofa_basso, MMSE_classelieve e MMSE_classenormale hanno valori p inferiori a 0,05, indicando che sono predittori significativi dell'outcome al livello 0,05. 
+Ad esempio le variabili SOFA e MMSE, rispettivamente, con un punteggio basso e lieve/moderato  hanno valori p inferiori a 0,05, indicando che sono predittori significativi dell'outcome al livello 0,05. 
 L'output fornisce anche informazioni sul rapporto di rischio per ogni variabile predittiva, che indica il rischio relativo associato a un aumento di una unità nella variabile predittiva. 
 
 # Conclusions
