@@ -1175,7 +1175,7 @@ cox_GEN <- coxph(Surv(ANNIOSSERV,all)~SOFAING_classe+AGE_classi+BMI_classi+CCSCO
 summary(cox_GEN)
 ```
 
-L'output mostra che diverse variabili predittive sono statisticamente significative nella previsione della variabile di outcome. 
+L'output mostra che diverse variabili predittive sono statisticamente significative nella previsione della variabile di outcome.
 Ad esempio le variabili SOFA e MMSE, rispettivamente, con un punteggio basso e lieve/moderato  hanno valori p inferiori a 0,05, indicando che sono predittori significativi dell'outcome al livello 0,05. 
 L'output fornisce anche informazioni sul rapporto di rischio per ogni variabile predittiva, che indica il rischio relativo associato a un aumento di una unità nella variabile predittiva. 
 
