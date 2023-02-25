@@ -24,7 +24,7 @@ Infine, è stata effettuata un'analisi di sopravvivenza, al fine di valutare la 
 
 # Introduction
 
-La nostra analisi riguarda un dataset di 64 osservazioni riguardanti pazienti anziani. Dopo aver effettuato la pulizia e il preprocessing dei dati, abbiamo eseguito un'analisi esplorativa dei dati per identificare le variabili più importanti per la salute degli anziani. In particolare, abbiamo individuato SOFA score e CCscore come le variabili più rilevanti per l'analisi della sopravvivenza. Queste variabili sono state utilizzate per valutare il rischio di disfunzione di organi e la gravità della malattia nei pazienti anziani. La nostra analisi di sopravvivenza ha permesso di valutare l'effetto di queste variabili sulla sopravvivenza dei pazienti anziani,
+La nostra analisi riguarda un dataset di 64 osservazioni riguardanti pazienti anziani. Dopo aver effettuato la pulizia e il preprocessing dei dati, abbiamo eseguito un'analisi esplorativa dei dati per identificare le variabili più importanti per la salute degli anziani. In particolare, abbiamo individuato SOFA e CCscore come le variabili più rilevanti per l'analisi della sopravvivenza. Queste variabili sono state utilizzate per valutare il rischio di disfunzione di organi e la gravità della malattia nei pazienti anziani. La nostra analisi di sopravvivenza ha permesso di valutare l'effetto di queste variabili sulla sopravvivenza dei pazienti anziani,
 
 Il punteggio "SOFA"(Sequential Organ Failure Assessment) che è uno strumento utilizzato per valutare la gravità dell'insufficienza di uno o più organi in pazienti in terapia intensiva.
 Esso viene utilizzato come strumento di valutazione per monitorare il miglioramento o il deterioramento della funzione dell'organo nel tempo.
@@ -35,9 +35,9 @@ L'EDA (Exploratory Data Analysis) è una fase fondamentale dell'analisi dei dati
 
 Analisi univariata: esaminare ogni variabile singolarmente per capire la loro distribuzione, valori anomali e statistiche riassuntive.
 
-Analisi bivariata: esaminare la relazione tra le diverse coppie di variabili per capire se esiste una correlazione o associazione tra di esse, abbiamo esaminato la relazione tra SOFA score e CC-score, tra età e BMI e tra anno e MMSE-score.
+Analisi bivariata: esaminare la relazione tra le diverse coppie di variabili per capire se esiste una correlazione o associazione tra di esse, abbiamo esaminato la relazione tra SOFA e CC-score, tra età e BMI e tra anno e MMSE-score.
 
-Analisi di sopravvivenza: in questo caso, l'EDA potrebbe includere la creazione di grafici di Kaplan-Meier per visualizzare la sopravvivenza dei pazienti in base alle variabili come SOFA score e CCscore.
+Analisi di sopravvivenza: in questo caso, l'EDA potrebbe includere la creazione di grafici di Kaplan-Meier per visualizzare la sopravvivenza dei pazienti in base alle variabili come SOFA e CCscore.
 
 Infine, per quanto riguarda la presentazione dei risultati, abbiamo fatto in modo che il lettore possa comprendere facilmente i risultati ottenuti.
 
@@ -724,7 +724,7 @@ Infine, la presenza di pochi valori nulli (sotto il 5%) può essere considerata 
 Un'analisi delle principali variabili rispetto alle classi di età può aiutare a comprendere le differenze tra le varie fasce d'età in termini di variabili di interesse.
 Ciò può fornire informazioni preziose per la gestione delle malattie e per lo sviluppo di interventi di prevenzione e trattamento specifici per le diverse fasce d'età.
 
-Andremo ad esaminare come variano "BMI", "SOFA-score", "CC-score", "MMSE-score" e altre variabili di interesse in base all'età dei pazienti.
+Andremo ad esaminare come variano "BMI", "SOFA", "CC-score", "MMSE-score" e altre variabili di interesse in base all'età dei pazienti.
 
 ```{r}
 # Calcola il numero di donne e uomini
@@ -781,7 +781,7 @@ ggplot(data, aes(x = SOFAING_classe, fill = AGE_classi)) +
   
 ```
 
-La maggior parte dei pazienti ha un "SOFA-score" basso, questo suggerisce che molti pazienti potrebbero non avere comorbilità significative, quindi potrebbe essere un fattore positivo per la loro salute e il loro benessere generale.
+La maggior parte dei pazienti ha un "SOFA" basso, questo suggerisce che molti pazienti potrebbero non avere comorbilità significative, quindi potrebbe essere un fattore positivo per la loro salute e il loro benessere generale.
 
 Inoltre, il fatto che ci siano solo due pazienti con uno score alto nella fascia d'età 70-80 suggerisce che i pazienti in questa fascia d'età potrebbero essere relativamente sani.
 
@@ -800,7 +800,7 @@ Tuttavia, il fatto che la maggior parte dei pazienti nella fascia d'età 70-80 a
 
 **Analisi delle principali variabili rispetto al sesso**
 
-Andiamo ad analizzare le distribuzioni di genere in base alle variabili più importanti: Età, BMI, CC score, SOFA score e MMSE.
+Andiamo ad analizzare le distribuzioni di genere in base alle variabili più importanti: Età, BMI, CC score, SOFA e MMSE.
 Osserviamo il numero di donne e uomini presenti nel dataset
 
 ```{r}
@@ -865,22 +865,22 @@ Per gli uomini le classi sono più omogenee e non ci sono grandi differenze.
 ggplot(data, aes(x = SOFAING_classe, fill = SEX)) +
   geom_bar(position = "dodge") +
   facet_grid(. ~ SEX) +
-  ggtitle("Distribuzione di genere per le classi  SOFA score") +
+  ggtitle("Distribuzione di genere per le classi  SOFA") +
   xlab("SOFA") +
   ylab("Conteggio") +
   scale_fill_brewer(palette = "Set2")+
   scale_y_continuous(breaks = seq(0, 40, 5))
 ```
 
-Un SOFA score basso indica che la funzionalità degli organi è relativamente stabile e non ci sono segni di insufficienza grave, tuttavia, bisogna anche considerare il fatto che il SOFA score non fornisce una valutazione completa dello stato di salute del paziente e non tiene conto di altri fattori importanti come la storia medica, la terapia attuale e il decorso della malattia.
+Un SOFA basso indica che la funzionalità degli organi è relativamente stabile e non ci sono segni di insufficienza grave, tuttavia, bisogna anche considerare il fatto che il SOFA non fornisce una valutazione completa dello stato di salute del paziente e non tiene conto di altri fattori importanti come la storia medica, la terapia attuale e il decorso della malattia.
 
-La maggior parte dei pazienti donna ha un SOFA score basso, ciò potrebbe suggerire che queste donne sono in una condizione relativamente stabile e non presentano una grave insufficienza d'organo.
+La maggior parte dei pazienti donna ha un punteggio SOFA basso, ciò potrebbe suggerire che queste donne sono in una condizione relativamente stabile e non presentano una grave insufficienza d'organo.
 
 ```{r}
 ggplot(data, aes(x = MMSE_classe, fill = SEX)) +
   geom_bar(position = "dodge") +
   facet_grid(. ~ SEX) +
-  ggtitle("Distribuzione di genere e delle classi di MMSE") +
+  ggtitle("Distribuzione di genere e per le classi di MMSE") +
   xlab("MSE") +
   ylab("Conteggio") +
   scale_fill_brewer(palette = "Set2")
@@ -891,7 +891,7 @@ Circa 15 pazienti su un totale di 62 hanno un punteggio "MMSE" moderato-grave, c
 
 **Funzione cumulata per SOFA e CCSCORE**
 
-Una funzione cumulata dell'età rispetto allo "SOFA-score" può fornire informazioni sul modo in cui la salute dei pazienti cambia con l'età.
+Una funzione cumulata dell'età rispetto allo "SOFA" può fornire informazioni sul modo in cui la salute dei pazienti cambia con l'età.
 
 La seguente funzione rappresenta la distribuzione cumulata delle osservazioni rispetto alla variabile di età e al punteggio SOFA.
 
@@ -908,7 +908,7 @@ geom = "step", size = 1.5) +
 scale_color_manual(values = c("lightpink", "steelblue"))+
 labs(y = "f(eta)")+theme(panel.background = element_rect(fill = "white" ))
 
-bxp <- pl + labs(title = "Funzioni cumulate Età - SOFA score",
+bxp <- pl + labs(title = "Funzioni cumulate Età - SOFA",
 
 subtitle = "Frequenze cumulate punteggio sofa per età e genere",
 x = "Punteggio SOFA", y = "Frequenza cumulata età")
@@ -917,7 +917,7 @@ bxp
 ```
 
 Il fatto che la funzione cumulata che rappresenta le donne sia sopra quella degli uomini per i punteggi SOFA da 0 a 2 potrebbe indicare che le donne in generale presentano meno comorbilità rispetto agli uomini nella stessa fascia di età.
-Tuttavia, il fatto che le funzioni si allineino per i punteggi SOFA da 2 a 4 potrebbe indicare che la relazione tra età e "SOFA-score" è simile per uomini e donne.
+Tuttavia, il fatto che le funzioni si allineino per i punteggi SOFA da 2 a 4 potrebbe indicare che la relazione tra età e "SOFA" è simile per uomini e donne.
 L'analisi delle funzioni cumulate potrebbe suggerire la presenza di differenze di genere nella distribuzione dei punteggi SOFA in relazione all'età, ma è importante considerare ulteriori informazioni e condizioni specifiche del dataset per una corretta interpretazione.
 
 ```{r}
@@ -971,8 +971,8 @@ table1(~ SEX + AGE  + AGE_classi + BMI + BMI_classi  + MMSE_classe + CCSCORE_cla
 
 In questa tabella viene presentata una descrizione delle variabili principali classificate in base al punteggio SOFA, dove per le variabili categoriche viene confrontata la numerosità tra i gruppi e le loro percentuali, mentre per quelle numeriche vengono osservate la media con la deviazione standard e la mediana con il range di appartenenza.
 
-Si può notare come ci sia una maggior presenza di pazienti con SOFA bassO, che è prevalentemente di genere femminile con un'età molto alta, superiore agli 80 anni in entrambe le categorie di SOFA e con un BMI normale.
-Inoltre, osservando la variabile "CC-score", si nota come nella categoria SOFA alto si definiscono pazienti con un punteggio di comorbilità medio/alto, mentre nella categoria SOFA basso il 58% dei pazienti ha un "ccscore"CC-score" basso.
+Si può notare come ci sia una maggior presenza di pazienti con SOFA basso, che è prevalentemente di genere femminile con un'età molto alta, superiore agli 80 anni in entrambe le categorie di SOFA e con un BMI normale.
+Inoltre, osservando la variabile "CC-score", si nota come nella categoria SOFA alto si definiscono pazienti con un punteggio di comorbilità medio/alto, mentre nella categoria SOFA basso il 58% dei pazienti ha un CC-score basso.
 Il P-value rappresenta la probabilità che l'effetto osservato o la differenza tra i gruppi o la relazione tra le variabili non siano dovuti al caso, ma siano effettivamente presenti nella popolazione di riferimento, è importante notare che in questo caso le variabili risultano non significativi al 5% , tranne che per la classe CC-score", quindi possiamo affermare che esiste una relazione significativa tra i due punteggi.
 
 ```{r}
@@ -1091,9 +1091,9 @@ cl.cex = 0.5, cl.pos = "n")
 ```
 
 Considerando solo le variabili più importanti per questa analisi, è possibile osservare sia correlazioni positive che negative.
-Tuttavia, il confronto più rilevante è quello tra il punteggio "SOFAING" e il "CC-score".
+Tuttavia, il confronto più rilevante è quello tra il punteggio "SOFA" e il "CC-score".
 Sebbene il coefficiente di correlazione tra queste due variabili sia debolmente positivo (forse a causa della bassa numerosità del campione), è comunque significativo.
-Ciò significa che ad ogni aumento di una unità del "CC-score", il "SOFAING" aumenta di circa il 26%.
+Ciò significa che ad ogni aumento di una unità del "CC-score", il "SOFA" aumenta di circa il 26%.
 In altre parole, se un paziente ha più malattie contemporaneamente, il rischio di disfunzione degli organi aumenta del 26%.
 
 # Survival analysis
