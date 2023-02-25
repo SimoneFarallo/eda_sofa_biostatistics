@@ -2,13 +2,13 @@
 title: "Biostatistica's Project"
 author: "Simone Farallo 889719 & Michele Salvaterra 891109"
 output:
-  pdf_document:
-    toc: yes
   html_document:
     toc: yes
     fig_caption: yes
     theme: flatly
     css: styles.css
+  pdf_document:
+    toc: yes
 editor_options: 
   markdown: 
     wrap: sentence
