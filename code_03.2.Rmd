@@ -1,6 +1,6 @@
 ---
 title: "Biostatistica's Project"
-author: "Simone Farallo & Michele Salvaterra"
+author: "Simone Farallo 889719 & Michele Salvaterra 891109"
 output:
   pdf_document:
     toc: yes
@@ -16,25 +16,30 @@ editor_options:
 
 # Abstract
 
-L'obiettivo di questo progetto è stato quello di partire da un dataset contenente degli errori e ripulirlo da essi attraverso la procedura di cleaning.
-Successivamente a questo abbiamo studiato le informazioni riguardanti le variabili e abbiamo provato a svolgere un'analisi preliminare di sopravvivenza.
-In conclusione abbiamo commentato i risultati raggiunti.
+Il nostro progetto ha come obiettivo l'analisi di un dataset riguardante dei pazienti anziani. La prima fase del progetto è stata dedicata alla pulizia dei dati e al loro processing, al fine di rendere il dataset utilizzabile per le successive fasi dell'analisi.
+
+Successivamente, è stata eseguita un'analisi esplorativa dei dati (EDA), al fine di individuare eventuali tendenze o correlazioni tra le variabili del dataset. Questa fase ha permesso di acquisire una migliore comprensione delle caratteristiche dei pazienti anziani in oggetto e di individuare le variabili più significative ai fini dell'analisi di sopravvivenza.
+
+Infine, è stata effettuata un'analisi di sopravvivenza, al fine di valutare la relazione tra le variabili del dataset e la sopravvivenza dei pazienti anziani.
 
 # Introduction
 
-Il team ha lavorato su un progetto dove l'obiettivo era quello di pulire un dataset contenente errori e condurre un'analisi di sopravvivenza.
+La nostra analisi riguarda un dataset di 64 osservazioni riguardanti pazienti anziani. Dopo aver effettuato la pulizia e il preprocessing dei dati, abbiamo eseguito un'analisi esplorativa dei dati per identificare le variabili più importanti per la salute degli anziani. In particolare, abbiamo individuato SOFA score e CCscore come le variabili più rilevanti per l'analisi della sopravvivenza. Queste variabili sono state utilizzate per valutare il rischio di disfunzione di organi e la gravità della malattia nei pazienti anziani. La nostra analisi di sopravvivenza ha permesso di valutare l'effetto di queste variabili sulla sopravvivenza dei pazienti anziani,
 
-Il dataset riguarda il punteggio "SOFA"(Sequential Organ Failure Assessment) che è uno strumento utilizzato per valutare la gravità dell'insufficienza di uno o più organi in pazienti in terapia intensiva.
+Il punteggio "SOFA"(Sequential Organ Failure Assessment) che è uno strumento utilizzato per valutare la gravità dell'insufficienza di uno o più organi in pazienti in terapia intensiva.
 Esso viene utilizzato come strumento di valutazione per monitorare il miglioramento o il deterioramento della funzione dell'organo nel tempo.
 
-Sottolineiamo che la fase iniziale di cleaning dei dati è fondamentale per qualsiasi tipo di analisi statistica.
-La presenza di errori o dati mancanti può influire negativamente sui risultati ottenuti e può portare a conclusioni errate.
+Il CCscore, invece, è un indice di comorbidità utilizzato per valutare la presenza di altre malattie croniche o condizioni preesistenti in un paziente. Il punteggio CCscore viene utilizzato per valutare la gravità della malattia e il rischio di mortalità in pazienti critici.
 
-In secondo luogo, per quanto riguarda l'analisi preliminare di sopravvivenza, è importante considerare che si tratta di un tipo di analisi statistica che si occupa di studiare il tempo che intercorre tra un evento iniziale e un evento finale.
-Questa analisi richiede l'utilizzo di specifici strumenti statistici, come ad esempio i modelli di regressione di Cox.
+L'EDA (Exploratory Data Analysis) è una fase fondamentale dell'analisi dei dati che prevede l'esplorazione del dataset per comprendere le caratteristiche e le relazioni tra le variabili, in questo specifico dataset l'EDA ha incluso:
+
+Analisi univariata: esaminare ogni variabile singolarmente per capire la loro distribuzione, valori anomali e statistiche riassuntive.
+
+Analisi bivariata: esaminare la relazione tra le diverse coppie di variabili per capire se esiste una correlazione o associazione tra di esse, abbiamo esaminato la relazione tra SOFA score e CC-score, tra età e BMI e tra anno e MMSE-score.
+
+Analisi di sopravvivenza: in questo caso, l'EDA potrebbe includere la creazione di grafici di Kaplan-Meier per visualizzare la sopravvivenza dei pazienti in base alle variabili come SOFA score e CCscore.
 
 Infine, per quanto riguarda la presentazione dei risultati, abbiamo fatto in modo che il lettore possa comprendere facilmente i risultati ottenuti.
-Inoltre, abbiamo citato le fonti utilizzate e descritto le metodologie utilizzate, in modo che il lavoro possa essere replicato in futuro.
 
 +--------------------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | #### **Variabile** | #### **Tipologia** | #### **Descrizione**                                                                                                                                                                                 |
@@ -100,7 +105,7 @@ library(survminer)
 library(ggfortify)
 ```
 
-Impostazione della directory.
+Impostiamo la directory.
 
 ```{r}
 setwd("C:/Users/Simone/Documents/Desktop/EDA_SOFA-Biostatistic")
@@ -108,7 +113,7 @@ setwd("C:/Users/Simone/Documents/Desktop/EDA_SOFA-Biostatistic")
 
 # Data loading
 
-Prima fase, caricamento dei dati.
+Carichiamo i dati.
 
 ```{r}
 data <- read_excel("SOFA.xlsx",)
@@ -122,12 +127,14 @@ Struttura del dataset.
 str(data)
 ```
 
-Si può notare come ci sia la presenza di valori numerici espressi in formato stringa.
+Si può notare come ci sia la presenza di alcuni formati errati e valori anomali.
 
 ```{r}
 #Statistiche descrittive
 summary(data)
 ```
+
+Confermiamo la presenza di valori anomali.
 
 ```{r}
 #Conta il numero di valori mancanti per ciascuna variabile del dataset
@@ -138,18 +145,18 @@ Osservando i dati si può notare la presenza di valori mancanti e di outlier, in
 
 # Data Cleaning
 
-Per comodità, data la dimensione del dataset, abbiamo deciso di correggere ogni variabile manualmente.
+Il data cleaning è il processo di identificazione e correzione di errori, incoerenze e dati mancanti all'interno di un dataset, per comodità, data la dimensione del dataset, abbiamo deciso di correggere ogni variabile manualmente.
 
 **Paziente**
 
-Controllo dei duplicati.
+Controlliamo l'eventuale presenza dei duplicati.
 
 ```{r}
 data$PAZIENTE[duplicated(data$PAZIENTE)]
 data[data$PAZIENTE== 16,]
 ```
 
-Si nota la presenza di due pazienti che hanno lo stesso numero identificativo, dunque la colonna "PAZIENTE" presenta un duplicato, procediamo con la correzzione.
+Si nota la presenza di due pazienti che hanno lo stesso numero identificativo, ma i valori delle altre colonne sono diverse, deduciamo che si tratti di due pazienti distinti, dunque procediamo con la correzzione.
 
 ```{r}
 data[7,1] = 17
@@ -163,13 +170,15 @@ data[data$PAZIENTE==16 | data$PAZIENTE==17,]
 data$NASCITA
 ```
 
-Come già avevamo notato le date hanno dei valori insensati, questo è dovuto al fatto che R non legge bene i file excel, inoltre c'è un valore da correggere per il paziente 111 e tre valori che contengono errori di battitura.
+Come avevamo già notato le date hanno dei valori insensati, questo è dovuto al fatto che R non legge bene i file excel, inoltre c'è un valore da correggere per il paziente 111 e tre valori che contengono errori di battitura.
 
 ```{r}
 (i <- data[data$PAZIENTE==111,])
 data$NASCITA[data$PAZIENTE==111]=sapply(Map(append, strsplit(i$NASCITA,""), after = nchar(i$NASCITA) - 4, "/"), paste, collapse = "")
 data[data$PAZIENTE==111,]
 ```
+
+Trasformiamo i numeri in data considerando come origine il "1899-12-30"
 
 ```{r}
 data$NASCITA = as.numeric(data$NASCITA)
@@ -205,12 +214,11 @@ data$STATCIV <- ifelse(data$STATCIV == 1, "non_sposato\a",
 data$STATCIV
 ```
 
-Non ci sono valori nulli e tutti i campi sono stati corretti.
-Bisogna dire che questa operazione non è sempre indispensabile, in alcuni domini di applicazioni e con determinate metodologie, come il Machine Learning, questa non va sempre svolta.
+Non ci sono valori nulli e tutti i campi sono stati corretti, bisogna dire che questa operazione non è sempre indispensabile.
 
 **Peso**
 
-Osservando la distribuzione della variabile "PESO" sono presenti dei valori -1, andiamo a modificarli trasformandoli in valori mancanti e contiamo i valori nulli.
+Osservando la distribuzione della variabile "PESO" sono presenti dei valori -1, andiamo a trasformare  i valori mancanti e li contiamo come se fossero dei valori nulli.
 
 ```{r}
 data$PESO =ifelse(data$PESO==-1,NA,data$PESO)
@@ -233,8 +241,7 @@ legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
 Notiamo come ci siano alcuni outlier, soprattutto una paziente ha un peso che equivale a 33kg.
-Osservando però i valori delle altre colonne ed anche l'età avanzata di molti pazienti, come si può vedere facilmente dando uno sguardo al boxplot, decidiamo momentaneamente di non eliminare l'osservazione.
-(da rivedere sta frase)
+Osservando però i valori delle altre colonne ed anche l'età avanzata di molti pazienti, come si può vedere facilmente dando uno sguardo al boxplot, abbiamo deciso momentaneamente di non eliminare l'osservazione.
 
 **ALTEZZA**
 
@@ -263,7 +270,7 @@ C'è un solo outlier di un paziente alto 135 cm, ma osservando il suo peso e alt
 
 **CADUTE**
 
-Per la variabile "CADUTE" ci sono valori anomali corrispondenti a -1, procediamo a corregerli.
+La variabile "CADUTE" presenta dei valori anomali corrispondenti a -1, procediamo a corregerli.
 
 ```{r}
 data$CADUTE = ifelse(data$CADUTE<0,NA,data$CADUTE)
@@ -280,7 +287,7 @@ data$CCSCORE
 
 **SOFAING**
 
-La variabile "SOFAING" non sembra presentare valori anomali
+La variabile "SOFAING" non sembra presentare problemi.
 
 ```{r}
 data$SOFAING
@@ -288,7 +295,7 @@ data$SOFAING
 
 **MMSE**
 
-La variabile "MMSE" presenta dei valori corrispondenti a "-1 = mancante" e "-2 = non valutabile", inoltre alcuni valori hanno le virgole ec altri i punti, procediamo a corregerli.
+La variabile "MMSE" presenta dei valori corrispondenti a "-1 = mancante" e "-2 = non valutabile", inoltre alcuni valori sono separati da virgole ed altri da punti, procediamo a corregerli.
 
 ```{r}
 data$MMSE = ifelse(data$MMSE<0,NA,data$MMSE)
@@ -296,6 +303,8 @@ data$MMSE = str_replace(data$MMSE, ",", ".")
 data$MMSE = as.numeric(data$MMSE)
 data$MMSE
 ```
+
+Osserviamo la distribuzione.
 
 ```{r}
 boxplot(data$MMSE, 
@@ -309,12 +318,11 @@ points(x = rep(1, length(data$MMSE)), y = data$MMSE, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
-Ci possono essere valori uguali a 00???
-(bro ma a chi parli? lol)
+Notiamo come ci sia un paziente con un valore uguale a "0" che sta a significare un massimo deficit cognitivo.
 
 **ALB**
 
-La variabile "ALB" presenta valori "-1" e dei differenti formati che rappresentano i valori, procediamo a formalizzare il tutto.
+La variabile "ALB" presenta valori "-1" e inoltre alcuni valori sono separati da virgole ed altri da punti, procediamo a formalizzare il tutto.
 
 ```{r}
 data$ALB = ifelse(data$ALB==-1,NA,data$ALB)
@@ -337,9 +345,11 @@ points(x = rep(1, length(data$ALB)), y = data$ALB, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
+Notiamo come ci sia molta differenza tra i valori di Albuminia.
+
 **CALC**
 
-La variabile "CALC" ha bisogno di sostituire le virgole presenti in esso con dei punti.
+La variabile "CALC" ha alcuni valori separati da virgole ed altri da punti, procediamo a formalizzare il tutto.
 
 ```{r}
 data$CALC = str_replace(data$CALC, ",", ".")
@@ -367,9 +377,12 @@ points(x = rep(1, length(data$CALC)), y = data$CALC, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
+Osserviamo la presenza di due outlier con valori molto bassi di calcio.
+
 **VITD**
 
-Ci sono diversi valori da correggere come i valori "-1" e cambiare le virgole in punti.
+Ci sono diversi valori da correggere come i valori "-1" e sono presenti alcuni valori separati da virgole ed altri da punti, procediamo a formalizzare il tutto.
+
 
 ```{r}
 data$VITD = str_replace(data$VITD, ",", ".")
@@ -392,11 +405,11 @@ points(x = rep(1, length(data$VITD)), y = data$VITD, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
-Presenza di 3 outlier.
+Osserviamo la presenza di 3 outlier, cioè tre pazienti che rispetto al resto del campione hanno dei valori di Vitamina D molto elevata.
 
 **HBING**
 
-Cambiamo le virgole in punti.
+Notiamo che anche qui sono presenti alcuni valori separati da virgole ed altri da punti, procediamo a formalizzare il tutto.
 
 ```{r}
 data$HBING = str_replace(data$HBING, ",", ".")
@@ -417,6 +430,8 @@ boxplot(data$HBING,
 points(x = rep(1, length(data$HBING)), y = data$HBING, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
+
+Anche in questo caso ci sono degli outlier sia oltre il limite superiore che inferiore dell'intera distribuzione.
 
 **TEMPRIC**
 
@@ -439,6 +454,8 @@ points(x = rep(1, length(data$TEMPRIC)), y = data$TEMPRIC, pch = 19, col = "red"
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
+Notiamo come per la maggior parte dei pazienti la durata del ricovero sia compresa tra i 0 e i 300 minuti.
+
 **DATADIM**
 
 La variabile "DATADIM" non presenta valori da correggere.
@@ -449,7 +466,7 @@ data$DATDIM
 
 **DATAINT**
 
-La variabile "DATAINT" non presenta errori da corregere, ma confrontando alcune osservazioni con la colonna della data di dimissione notiamo come per due pazienti la data di dimissione è prima della data di intervento.
+La variabile "DATAINT" non presenta errori da corregere, ma confrontando alcune osservazioni con la colonna della data di dimissione notiamo come per due pazienti questa è prima della data di intervento.
 
 ```{r}
 errors <- ifelse(difftime(data$DATDIM, data$DATINT, units = "days") >= 0, TRUE, FALSE)
@@ -458,7 +475,7 @@ data[indici, ]
 nrow(data)
 ```
 
-Possiamo eliminare le righe dei due pazienti o eliminare la data di dimissione, procediamo eliminando la data di dimissione.
+Possiamo eliminare le righe dei due pazienti o eliminare la data di dimissione, procediamo sostituendo con "NA" la data di dimissione.
 
 ```{r}
 #Cancellare le righe
@@ -475,7 +492,7 @@ nrow(data)
 
 **INTDURAT**
 
-La variabile "INTDURAT" non sembra presetare errori anomali o valori mancanti.
+La variabile "INTDURAT" non sembra presentare errori anomali o valori mancanti.
 
 ```{r}
 data$INTDURAT
@@ -516,7 +533,7 @@ data$ANEST
 
 **DATA DECESSO**
 
-La variabile "DATA DECESSO" presenta molteplici errori: innanzitutto ci sono valori uguali a "-1" che equivalgono a "Si è rifiutata"; dopo di che le date sono rappresentate con valori di tipo non numerico(stringa?), procediamo con la correzione di tutti i valori.
+La variabile "DATA DECESSO" presenta molteplici errori: innanzitutto ci sono valori uguali a "-1" che equivalgono a "Si è rifiutata"; dopo di che le date sono rappresentate con valori di tipo non numerico, procediamo con la correzione.
 
 ```{r}
 data$'DATA DECESSO'
@@ -530,15 +547,16 @@ data$'DATA DECESSO' = as.numeric(data$`DATA DECESSO`)
 data$'DATA DECESSO'
 ```
 
-Abbiamo concluso la fase di cleaning, ogni variabile è stata ripulita, prima di svolgere le nostre analisi sarebbe utile creare nuove variabili che potrebbero servirci di seguito.
+Abbiamo concluso la fase di cleaning, ogni variabile è stata ripulita, confermiamo la presenza di molti outlier, abbiamo deciso di non eliminaeli per non ridurre ulteriormente la dimensione del dataset.
 
 # Pre Processing
 
-In questa fase andiamo a creare delle nuove variabili per il nostro dataset che ci serviranno per le analisi future.
-Andiamo a creare nuove colonne utilizzando le classi per i punteggi.
-Per primo dividiamo il "CCSCORE" in tre classi: basso, medio, alto.
+In questa fase andiamo a creare delle nuove variabili per il nostro dataset che ci serviranno successivamente.
+Andiamo a definire nuove variabili dividendo i punteggi in classi.
 
 **CCSCORE_classe**
+
+Dividiamo il punteggio "CCSCORE" in tre classi: basso, medio, alto.
 
 ```{r}
 data$CCSCORE<-as.numeric(data$CCSCORE)
@@ -549,18 +567,16 @@ ifelse((data$CCSCORE==3|data$CCSCORE==4),'cc_medio','cc_alto'))
 
 **SOFAING_classe**
 
-Per il punteggio "SOFAING" sono state create due classi: basso e alto.
+Dividiamo il punteggio "SOFAING" in due classi: basso e alto.
 
 ```{r}
 data$SOFAING_classe = ifelse(data$SOFAING== '0','sofa_basso', 'sofa_alto')
 table(data$SOFAING_classe)
 ```
 
-Creiamo la variabile "BMI" ed anche la classe.
-
 **MMSE_classe**
 
-Dividamo il punteggio "MMSE_classe".
+Dividamo il punteggio "MMSE" in quattro classi: grave, moderato, lieve, normale.
 
 ```{r}
 data$MMSE_classe <- data$MMSE
@@ -573,7 +589,10 @@ data$MMSE_classe <- cut(data$MMSE, breaks = c(0, 9, 18, 23, 30),
 table(data$MMSE_classe)
 ```
 
-\*BMI e BMI_classe\*\*
+**BMI e BMI_classe**
+
+Andiamo a creare la variabile "BMI" e le sue classi.
+Il BMI (Body Mass Index) è un indice che indica la relazione tra il peso e l'altezza di una persona.
 
 ```{r}
 data$PESO<-as.numeric(data$PESO)
@@ -584,9 +603,10 @@ head(data$BMI)
 table(data$BMI_classi)
 ```
 
-Calcoliamo l'età dei pazienti, assumendo la data di intervento come riferimento per il calcolo.
-
 **AGE e AGE_classe**
+
+Calcoliamo l'età dei pazienti, assumendo la data di intervento come riferimento per il calcolo, anche questa variabile la dividiamo in classi.
+
 
 ```{r}
 # calculate the age in years
@@ -595,7 +615,7 @@ data$AGE <- trunc(data$AGE)
 cat("data$AGE =", data$AGE, "\n")
 ```
 
-Dividamo in classi anche questa variabile.
+Il range delle classi viene fissato a 5 anni.
 
 ```{r}
 # create breakpoints for age classes
@@ -611,7 +631,7 @@ data$AGE_classi
 
 **GGOSSERV e ANNIOSSERV**
 
-Infine andiamo a calcolare i giorni che il paziente rimane in osservazione dalla durata dell'intervento ad una data decisa a priori, che assumiamo sia sotto osservazione della clinica, questa variabile ci servirà per la curva di sopravvivenza.
+Infine andiamo a calcolare i giorni che il paziente rimane in osservazione dalla durata dell'intervento ad una data decisa a priori, assumendo che i paienti rimangano sotto osservazione della clinica; questa variabile ci servirà per la costruzione della curva di sopravvivenza.
 
 ```{r}
 
@@ -628,7 +648,7 @@ data$GGOSSERV = as.numeric(difftime(data$fine_data, data$DATINT, units = "days")
 data$GGOSSERV
 ```
 
-Osserviamo due valori negativi, quindi questo significa che ci sono due date incongruenti tra data decesso ed intervento, la data di decesso è un dato molto importante e significativo, decidiamo quindi di eliminare tutti i dati riguardanti questi pazienti per non influire sulle nostre analisi.
+Osserviamo due valori negativi, quindi questo significa che ci sono due date incongruenti tra data decesso ed intervento, considerando che la data di decesso è un dato molto importante e significativo, decidiamo di eliminare tutti i dati riguardanti questi pazienti per non influire sulle nostre analisi.
 
 ```{r}
 data <- subset(data, GGOSSERV>=0)
