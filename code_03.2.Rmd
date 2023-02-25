@@ -116,7 +116,7 @@ setwd("C:/Users/Simone/Documents/Desktop/EDA_SOFA-Biostatistic")
 Carichiamo i dati.
 
 ```{r}
-data <- read_excel("SOFA.xlsx",)
+data <- read_excel("SOFA.xlsx")
 head(data)
 ```
 
@@ -178,7 +178,10 @@ data$NASCITA[data$PAZIENTE==111]=sapply(Map(append, strsplit(i$NASCITA,""), afte
 data[data$PAZIENTE==111,]
 ```
 
+<<<<<<< HEAD
 Trasformiamo i numeri in data considerando come origine il "1899-12-30"
+=======
+>>>>>>> ea41e4255c71a0a7275101e834cfccda03f69ed0
 
 ```{r}
 data$NASCITA = as.numeric(data$NASCITA)
@@ -449,7 +452,7 @@ boxplot(data$TEMPRIC,
         names = c("TEMPRIC"),
         ylab = "TEMPRIC",     
         pch = 19,
-        main= "Distribuzione TEMPRIC")
+        main= "Distribuzione TEMPRIC(in minuti)")
 points(x = rep(1, length(data$TEMPRIC)), y = data$TEMPRIC, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
@@ -533,11 +536,16 @@ data$ANEST
 
 **DATA DECESSO**
 
+<<<<<<< HEAD
 La variabile "DATA DECESSO" presenta molteplici errori: innanzitutto ci sono valori uguali a "-1" che equivalgono a "Si è rifiutata"; dopo di che le date sono rappresentate con valori di tipo non numerico, procediamo con la correzione.
 
+=======
+>>>>>>> ea41e4255c71a0a7275101e834cfccda03f69ed0
 ```{r}
 data$'DATA DECESSO'
 ```
+
+La variabile "DATA DECESSO" presenta molteplici errori: innanzitutto ci sono valori uguali a "-1" che equivalgono a "Si è rifiutata"; dopo di che le date sono rappresentate con valori di tipo non numerico(stringa?), procediamo con la correzione di tutti i valori.
 
 ```{r}
 data$'DATA DECESSO' = ifelse(data$`DATA DECESSO`=='SI è RIFIUTATA',NA,data$`DATA DECESSO`)
@@ -582,10 +590,10 @@ Dividamo il punteggio "MMSE" in quattro classi: grave, moderato, lieve, normale.
 data$MMSE_classe <- data$MMSE
 
 # Raggruppare i punteggi in classi
-data$MMSE_classe <- cut(data$MMSE, breaks = c(0, 9, 18, 23, 30), 
+data$MMSE_classe <- cut(data$MMSE, breaks = c(-1, 9, 18, 23, 30), 
                                     labels = c("grave", "moderato", "lieve", "normale"))
 
-# Visualizzare il conteggio di osservazioni in ogni classe
+#Conteggio delle osservazioni in ogni classe
 table(data$MMSE_classe)
 ```
 
@@ -618,9 +626,7 @@ cat("data$AGE =", data$AGE, "\n")
 Il range delle classi viene fissato a 5 anni.
 
 ```{r}
-# create breakpoints for age classes
 breakpoints <- c(69, 75, 80, 85, 90, 95, 105)
-# divide the AGE variable into age classes
 data$AGE_classi <- cut(data$AGE, breakpoints, labels = c("70-75", "75-80", "80-85", "85-90", "90-95", "95-100+"))
 table(data$AGE_classi)
 ```
