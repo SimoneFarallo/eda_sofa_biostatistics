@@ -18,13 +18,13 @@ editor_options:
 
 Il nostro progetto ha come obiettivo l'analisi di un dataset riguardante dei pazienti anziani. La prima fase del progetto è stata dedicata alla pulizia dei dati e al loro processing, al fine di rendere il dataset utilizzabile per le successive fasi dell'analisi.
 
-Successivamente, è stata eseguita un'analisi esplorativa dei dati (EDA), al fine di individuare eventuali tendenze o correlazioni tra le variabili del dataset. Questa fase ha permesso di acquisire una migliore comprensione delle caratteristiche dei pazienti anziani in oggetto e di individuare le variabili più significative ai fini dell'analisi di sopravvivenza.
+Successivamente, è stata eseguita un'analisi esplorativa dei dati (EDA), al fine di individuare eventuali tendenze o correlazioni tra le variabili del dataset. Questa fase ha permesso di acquisire una migliore comprensione delle caratteristiche dei pazienti anziani in oggetto e di individuare le variabili più significative.
 
-Infine, è stata effettuata un'analisi di sopravvivenza, al fine di valutare la relazione tra le variabili del dataset e la sopravvivenza dei pazienti anziani.
+Infine, è stata effettuata un'analisi di sopravvivenza, al fine di valutare la relazione tra le variabili del dataset e la sopravvivenza dei pazienti.
 
 # Introduction
 
-La nostra analisi riguarda un dataset di 64 osservazioni riguardanti pazienti anziani. Dopo aver effettuato la pulizia e il preprocessing dei dati, abbiamo eseguito un'analisi esplorativa dei dati per identificare le variabili più importanti per la salute degli anziani. In particolare, abbiamo individuato SOFA e CCscore come le variabili più rilevanti per l'analisi della sopravvivenza. Queste variabili sono state utilizzate per valutare il rischio di disfunzione di organi e la gravità della malattia nei pazienti anziani. La nostra analisi di sopravvivenza ha permesso di valutare l'effetto di queste variabili sulla sopravvivenza dei pazienti anziani,
+La nostra analisi riguarda un dataset di 64 osservazioni riguardanti pazienti anziani. Dopo aver effettuato la pulizia e il preprocessing dei dati, abbiamo eseguito un'analisi esplorativa per identificare le variabili più importanti per la salute degli anziani. In particolare, abbiamo individuato SOFA e CCscore come le variabili più rilevanti per l'analisi della sopravvivenza. Queste variabili sono state utilizzate per valutare il rischio di disfunzione di organi e la gravità della malattia nei pazienti anziani.
 
 Il punteggio "SOFA"(Sequential Organ Failure Assessment) che è uno strumento utilizzato per valutare la gravità dell'insufficienza di uno o più organi in pazienti in terapia intensiva.
 Esso viene utilizzato come strumento di valutazione per monitorare il miglioramento o il deterioramento della funzione dell'organo nel tempo.
@@ -37,7 +37,7 @@ Analisi univariata: esaminare ogni variabile singolarmente per capire la loro di
 
 Analisi bivariata: esaminare la relazione tra le diverse coppie di variabili per capire se esiste una correlazione o associazione tra di esse, abbiamo esaminato la relazione tra SOFA e CC-score, tra età e BMI e tra anno e MMSE-score.
 
-Analisi di sopravvivenza: in questo caso, l'EDA potrebbe includere la creazione di grafici di Kaplan-Meier per visualizzare la sopravvivenza dei pazienti in base alle variabili come SOFA e CCscore.
+Analisi di sopravvivenza: in questo caso, l'EDA include la creazione di grafici di Kaplan-Meier per visualizzare la sopravvivenza dei pazienti e il modello di Cox.
 
 Infine, per quanto riguarda la presentazione dei risultati, abbiamo fatto in modo che il lettore possa comprendere facilmente i risultati ottenuti.
 
@@ -141,7 +141,7 @@ Confermiamo la presenza di valori anomali.
 colSums(is.na(data))
 ```
 
-Osservando i dati si può notare la presenza di valori mancanti e di outlier, inoltre nelle distribuzioni delle variabili si notano valori anomali e valori che necessitano di una correzione, da queste premesse iniziamo la fase di cleaning e preprocessing del dataset.
+Osservando i dati si può notare la presenza di valori mancanti, inoltre nelle distribuzioni delle variabili si notano valori anomali e valori che necessitano di una correzione, da queste premesse iniziamo la fase di cleaning e preprocessing del dataset.
 
 # Data Cleaning
 
@@ -156,7 +156,7 @@ data$PAZIENTE[duplicated(data$PAZIENTE)]
 data[data$PAZIENTE== 16,]
 ```
 
-Si nota la presenza di due pazienti che hanno lo stesso numero identificativo, ma i valori delle altre colonne sono diverse, deduciamo che si tratti di due pazienti distinti, dunque procediamo con la correzzione.
+Si nota la presenza di due pazienti che hanno lo stesso numero identificativo, ma i valori delle altre colonne sono diverse, deduciamo che si tratti di due pazienti distinti, dunque procediamo con la correzione.
 
 ```{r}
 data[7,1] = 17
@@ -178,10 +178,7 @@ data$NASCITA[data$PAZIENTE==111]=sapply(Map(append, strsplit(i$NASCITA,""), afte
 data[data$PAZIENTE==111,]
 ```
 
-<<<<<<< HEAD
 Trasformiamo i numeri in data considerando come origine il "1899-12-30"
-=======
->>>>>>> ea41e4255c71a0a7275101e834cfccda03f69ed0
 
 ```{r}
 data$NASCITA = as.numeric(data$NASCITA)
@@ -348,7 +345,7 @@ points(x = rep(1, length(data$ALB)), y = data$ALB, pch = 19, col = "red")
 legend("topright", legend = "Pazienti", pch = 19, col = "red")
 ```
 
-Notiamo come ci sia molta differenza tra i valori di Albuminia.
+Notiamo come ci sia molta differenza tra i valori di albumina.
 
 **CALC**
 
@@ -536,16 +533,13 @@ data$ANEST
 
 **DATA DECESSO**
 
-<<<<<<< HEAD
 La variabile "DATA DECESSO" presenta molteplici errori: innanzitutto ci sono valori uguali a "-1" che equivalgono a "Si è rifiutata"; dopo di che le date sono rappresentate con valori di tipo non numerico, procediamo con la correzione.
 
-=======
->>>>>>> ea41e4255c71a0a7275101e834cfccda03f69ed0
 ```{r}
 data$'DATA DECESSO'
 ```
 
-La variabile "DATA DECESSO" presenta molteplici errori: innanzitutto ci sono valori uguali a "-1" che equivalgono a "Si è rifiutata"; dopo di che le date sono rappresentate con valori di tipo non numerico(stringa?), procediamo con la correzione di tutti i valori.
+La variabile "DATA DECESSO" presenta molteplici errori: innanzitutto ci sono valori uguali a "-1" che equivalgono a "Si è rifiutata"; dopo di che le date sono rappresentate con valori di tipo non numerico, procediamo con la correzione di tutti i valori.
 
 ```{r}
 data$'DATA DECESSO' = ifelse(data$`DATA DECESSO`=='SI è RIFIUTATA',NA,data$`DATA DECESSO`)
@@ -555,7 +549,7 @@ data$'DATA DECESSO' = as.numeric(data$`DATA DECESSO`)
 data$'DATA DECESSO'
 ```
 
-Abbiamo concluso la fase di cleaning, ogni variabile è stata ripulita, confermiamo la presenza di molti outlier, abbiamo deciso di non eliminaeli per non ridurre ulteriormente la dimensione del dataset.
+Abbiamo concluso la fase di cleaning, ogni variabile è stata ripulita, confermiamo la presenza di molti outlier, abbiamo deciso di non eliminarli per non ridurre ulteriormente la dimensione del dataset.
 
 # Pre Processing
 
@@ -724,7 +718,7 @@ Infine, la presenza di pochi valori nulli (sotto il 5%) può essere considerata 
 Un'analisi delle principali variabili rispetto alle classi di età può aiutare a comprendere le differenze tra le varie fasce d'età in termini di variabili di interesse.
 Ciò può fornire informazioni preziose per la gestione delle malattie e per lo sviluppo di interventi di prevenzione e trattamento specifici per le diverse fasce d'età.
 
-Andremo ad esaminare come variano "BMI", "SOFA", "CC-score", "MMSE-score" e altre variabili di interesse in base all'età dei pazienti.
+Andremo ad esaminare come variano "BMI", "SOFA", "CC-score", "MMSE-score" in base all'età dei pazienti.
 
 ```{r}
 # Calcola il numero di donne e uomini
@@ -768,8 +762,6 @@ Circa la metà dei pazienti ha un "CC-score" basso, questo suggerisce che molti 
 Al contrario, il fatto che circa 20 pazienti abbiano un "CC-score" medio suggerisce che un certo numero di pazienti potrebbe avere comorbilità moderate.
 Inoltre, l'assenza di pazienti con "CC-score" alto nella fascia d'età 75-80 suggerisce che potrebbero avere una buona salute generale.
 
-Inoltre, l'informazione che la classe di età 95 è presente solo nel "CC-score" basso e medio potrebbe, tuttavia, va considerato che questa informazione potrebbe essere influenzata dal fatto che il campione di pazienti anziani sia relativamente piccolo e non rappresentativo.
-
 ```{r}
 ggplot(data, aes(x = SOFAING_classe, fill = AGE_classi)) +
   geom_bar(position = "dodge") +
@@ -800,8 +792,8 @@ Tuttavia, il fatto che la maggior parte dei pazienti nella fascia d'età 70-80 a
 
 **Analisi delle principali variabili rispetto al sesso**
 
-Andiamo ad analizzare le distribuzioni di genere in base alle variabili più importanti: Età, BMI, CC score, SOFA e MMSE.
-Osserviamo il numero di donne e uomini presenti nel dataset
+Andiamo ad analizzare le distribuzioni di genere in base alle variabili più importanti: Età, BMI, CC score, SOFA e MMSE. 
+Osserviamo il numero di donne e uomini presenti nel dataset.
 
 ```{r}
 # Calcola il numero di donne e uomini
@@ -1013,9 +1005,8 @@ pvalue_inverted <- function(x, ...) {
 table1(~ SEX + AGE + AGE_classi + BMI + BMI_classi + MMSE_classe +SOFAING_classe | CCSCORE_classe, data = data, overall = FALSE, extra.col = list('P-value' = pvalue_inverted))
 
 ```
+In questa tabella viene presentata una descrizione delle variabili principali classificate in base al CC-score, dove per le variabili categoriche viene confrontata la numerosità tra i gruppi e le loro percentuali, mentre per quelle numeriche vengono osservate la media con la deviazione standard e la mediana con il range di appartenenza.
 
-La tabella riporta le frequenze e le percentuali di alcune variabili in relazione alla classificazione dei pazienti in tre gruppi (cc_alto, cc_basso, cc_medio) e all'interno di ogni gruppo, sono riportati i valori delle altre variabili (sesso, età, BMI, MMSE_classe, SOFAING_classe).
-La tabella riporta anche il valore di p per il test di significatività per ogni variabile in ogni gruppo.
 Per quanto riguarda il sesso, la maggioranza dei pazienti in tutti e tre i gruppi sono donne, ma non c'è una differenza significativa tra i gruppi (p = 0,683).
 Inoltre, non ci sono differenze significative tra i gruppi per l'età e il BMI.
 
@@ -1025,7 +1016,7 @@ Infine, la distribuzione dei pazienti in base all'età e al BMI, suddivisi in cl
 
 **CCSCORE e SOFA** 
 
-Questa tabella riporta la distribuzione del punteggio SOFA diviso in due gruppi in base al valore di cutoff utilizzato per definire il gruppo e in base al sesso (donna e uomo).
+Andiamo ad anaizzare la relazione tra le variabili SOFA e CCSCORE in base al genere.
 
 ```{r}
 table1(~ CCSCORE_classe | SOFAING_classe*SEX, data=data,overall=F, extra.col=list('P-value'=pvalue))
@@ -1093,8 +1084,7 @@ cl.cex = 0.5, cl.pos = "n")
 Considerando solo le variabili più importanti per questa analisi, è possibile osservare sia correlazioni positive che negative.
 Tuttavia, il confronto più rilevante è quello tra il punteggio "SOFA" e il "CC-score".
 Sebbene il coefficiente di correlazione tra queste due variabili sia debolmente positivo (forse a causa della bassa numerosità del campione), è comunque significativo.
-Ciò significa che ad ogni aumento di una unità del "CC-score", il "SOFA" aumenta di circa il 26%.
-In altre parole, se un paziente ha più malattie contemporaneamente, il rischio di disfunzione degli organi aumenta del 26%.
+Ciò significa che ad ogni aumento di una unità del "CC-score", il "SOFA" aumenta di circa il 26%, in altre parole, se un paziente ha più malattie contemporaneamente, il rischio di disfunzione degli organi aumenta del 26%.
 
 # Survival analysis
 
@@ -1164,7 +1154,7 @@ cox_SOFA <- coxph(Surv(ANNIOSSERV, all) ~ SOFAING_classe, data = data_1)
 summary(cox_SOFA)
 ```
 
-Il risultato più importante da notare è il p-value del test di Wald, pari a 0.001, che indica che la variabile indipendente SOFAING_classe è significativamente associata alla sopravvivenza dei pazienti. Inoltre, il coefficiente di regressione per la classe "sofa_basso" è -2.1358, il che significa che i pazienti con un punteggio SOFA basso hanno un tasso di rischio di mortalità significativamente inferiore rispetto a quelli con un punteggio SOFA alto.
+Il risultato più importante da notare è il p-value del test di Wald, pari a 0.001, che indica che la variabile indipendente SOFA è significativamente associata alla sopravvivenza dei pazienti. Inoltre, il coefficiente di regressione per la classe "sofa_basso" è -2.1358, il che significa che i pazienti con un punteggio SOFA basso hanno un tasso di rischio di mortalità significativamente inferiore rispetto a quelli con un punteggio SOFA alto.
 
 Il valore di concordanza è pari a 0.768, il che indica un buon adattamento del modello ai dati. In generale, questi risultati suggeriscono che il punteggio SOFA può essere un fattore importante nella prognosi dei pazienti e può essere utilizzato come indicatore di gravità della malattia.
 
@@ -1177,7 +1167,6 @@ summary(cox_GEN)
 
 L'output mostra che diverse variabili predittive sono statisticamente significative nella previsione della variabile di outcome.
 Ad esempio le variabili SOFA e MMSE, rispettivamente, con un punteggio basso e lieve/moderato  hanno valori p inferiori a 0,05, indicando che sono predittori significativi dell'outcome al livello 0,05. 
-L'output fornisce anche informazioni sul rapporto di rischio per ogni variabile predittiva, che indica il rischio relativo associato a un aumento di una unità nella variabile predittiva. 
 
 # Conclusions
 
@@ -1186,5 +1175,3 @@ In sintesi, il presente progetto ha riguardato un'analisi di dati complessi, car
 Successivamente, abbiamo condotto un'analisi esplorativa dei dati per comprendere meglio la distribuzione e la relazione tra le variabili. Questa fase ha permesso di individuare alcune variabili che sembrano influenzare la sopravvivenza dei soggetti in esame.
 
 Infine, abbiamo applicato un'analisi di sopravvivenza per valutare l'effetto di queste variabili sulla sopravvivenza dei soggetti. I risultati hanno mostrato che alcune variabili sono fortemente correlate con la sopravvivenza e possono essere utilizzate come predittori per identificare i soggetti a maggior rischio.
-
-In conclusione, l'analisi di sopravvivenza è stata fondamentale per comprendere le relazioni tra le variabili e per identificare i fattori di rischio per la sopravvivenza dei soggetti. Grazie alla pulizia dei dati e alla fase di pre-processing, abbiamo ottenuto un dataset di alta qualità che ha consentito di ottenere risultati affidabili e significativi.
